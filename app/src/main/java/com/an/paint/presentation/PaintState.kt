@@ -9,7 +9,6 @@ data class PaintState(
     val selectedShape: Int = 1,
     val helperPoint: DrawPoint? = null,
     val elements: List<Element> = emptyList(),
-    val dragPaintElement: DrawDetails? = null,
     val selectedColor: Color = Color.Black,
     val isInEditMode: Boolean = false,
     val selectedElement: Element? = null,

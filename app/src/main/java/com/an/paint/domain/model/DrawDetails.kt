@@ -1,21 +1,21 @@
 package com.an.paint.domain.model
 
+import android.graphics.Bitmap
 import androidx.compose.ui.graphics.Color
-import com.an.paint.domain.util.DrawnElement
+import androidx.compose.ui.graphics.ImageBitmap
 
 sealed class DrawDetails(
-    category: DrawnElement,
     p1: DrawPoint,
     p2: DrawPoint? = null,
     radius: Float? = null,
-    color: Color = Color.Black
+    color: Color = Color.Black,
+    bitmap: Bitmap? = null
 ) {
     data class Line(
         val p1: DrawPoint,
         val p2: DrawPoint,
         val color: Color = Color.Black
     ): DrawDetails(
-        category = DrawnElement.Line,
         p1 = p1,
         p2 = p2,
         color = color
@@ -25,7 +25,6 @@ sealed class DrawDetails(
         val p2: DrawPoint,
         val color: Color = Color.Black
     ): DrawDetails(
-        category = DrawnElement.Rectangle,
         p1 = p1,
         p2 = p2,
         color = color
@@ -35,7 +34,6 @@ sealed class DrawDetails(
         val radius: Float,
         val color: Color = Color.Black
     ): DrawDetails(
-        category = DrawnElement.Circle,
         p1 = p1,
         radius = radius,
         color = color
@@ -44,9 +42,18 @@ sealed class DrawDetails(
         val p1: DrawPoint,
         val color: Color = Color.Black
     ): DrawDetails(
-        category = DrawnElement.Point,
         p1 = p1,
         color = color
+    )
+
+    data class Image(
+        val p1: DrawPoint,
+        val p2: DrawPoint,
+        val bitmap: Bitmap
+    ): DrawDetails(
+        p1 = p1,
+        p2 = p2,
+        bitmap = bitmap
     )
 
 

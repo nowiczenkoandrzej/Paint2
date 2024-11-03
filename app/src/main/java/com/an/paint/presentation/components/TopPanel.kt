@@ -41,7 +41,8 @@ fun TopPanel(
     onSelectShape: (Int) -> Unit,
     onColorPickerClick: (Boolean) -> Unit,
     onChangeModeClick: () -> Unit,
-    isInEditMode: Boolean = false
+    isInEditMode: Boolean = false,
+    onPickImage: () -> Unit
 ) {
 
     var shapePickerExpanded by remember { mutableStateOf(false) }
@@ -84,6 +85,7 @@ fun TopPanel(
                             modifier = Modifier.size(48.dp)
                         )
                     }
+
                 }
             }
             DropdownMenu(expanded = shapePickerExpanded, onDismissRequest = { shapePickerExpanded = false }) {
@@ -126,6 +128,19 @@ fun TopPanel(
                         )
                     }
                 )
+                DropdownMenuItem(
+                    text = { Text(text = "Image") },
+                    onClick = {
+                        shapePickerExpanded = false
+                        onPickImage()
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.outline_image_24),
+                            contentDescription = "Image"
+                        )
+                    }
+                )
 
             }
         }
@@ -138,7 +153,7 @@ fun TopPanel(
                 .background(editButtonBackgroundColor)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.outline_back_hand_24),
+                painter = painterResource(id = R.drawable.outline_mode_edit_outline_24),
                 contentDescription = "grab",
                 modifier = Modifier
                     .size(48.dp)

@@ -8,7 +8,7 @@ import kotlin.math.sqrt
 class Circle(
     val center: DrawPoint,
     val radius: Float,
-    override val color: Color
+    override val color: Color,
 ): Element {
     override fun draw(): DrawDetails {
         return DrawDetails.Circle(p1 = center, radius = radius, color = color)

@@ -1,9 +1,17 @@
 package com.an.paint.presentation
 
 import ColorPicker
+import android.content.Intent
+import android.content.UriMatcher
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -14,7 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.window.Popup
+import androidx.core.net.UriCompat
+import com.an.paint.data.toBitmap
+import com.an.paint.domain.model.DrawPoint
 import com.an.paint.domain.model.toDrawPoint
 import com.an.paint.presentation.components.DrawingArea
 import com.an.paint.presentation.components.editing.SelectedElementEditPanel
@@ -34,6 +48,33 @@ fun PaintScreen(
     var colorPickerExpanded by remember { mutableStateOf(false) }
 
 
+    val context = LocalContext.current
+
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+    ) { uri: Uri? ->
+
+        uri?.let {
+
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+
+            context.contentResolver.openInputStream(uri).use { input ->
+                BitmapFactory.decodeStream(input, null, options)
+            }
+            val width = options.outWidth.toFloat()
+            val height = options.outHeight.toFloat()
+
+            viewModel.onAction(PaintAction.AddImage(
+                bitmap = uri.toBitmap(context),
+                size = DrawPoint(width, height)
+            ))
+        }
+
+    }
+
     Column {
         TopPanel(
             modifier = Modifier,
@@ -42,8 +83,10 @@ fun PaintScreen(
             onSelectShape = { viewModel.onAction(PaintAction.SelectShape(it)) },
             onColorPickerClick = { colorPickerExpanded = it},
             onChangeModeClick = { viewModel.onAction(PaintAction.ChangeMode)},
-            isInEditMode = state.isInEditMode
+            isInEditMode = state.isInEditMode,
+            onPickImage = { launcher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
         )
+
         DrawingArea(
             onTap = {
                 viewModel.onAction(PaintAction.TapDrawingArea(it.toDrawPoint()))
@@ -53,10 +96,9 @@ fun PaintScreen(
             lastTouchPoint = state.helperPoint,
             onDrag = {
                      viewModel.onAction(PaintAction.DragElement(it))
-            },
-            dragPaintElement = state.dragPaintElement,
-            modifier = Modifier.weight(1f)
+            }
         )
+        Spacer(modifier = Modifier.weight(1f))
         AnimatedVisibility(state.isInEditMode && state.selectedElement != null) {
             if(state.selectedElement != null) {
                 SelectedElementEditPanel(

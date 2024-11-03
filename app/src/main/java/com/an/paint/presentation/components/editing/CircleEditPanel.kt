@@ -58,9 +58,12 @@ fun CircleEditPanel(
             OutlinedTextField(
                 value = String.format("%.0f", editedCircle.center.x),
                 onValueChange = {
+                    var newValue = it
+                    if(newValue.isEmpty()) newValue = "0"
+
                     val newCircle = Circle(
                         center = DrawPoint(
-                            x = it.toFloat(),
+                            x = newValue.toFloat(),
                             y = editedCircle.center.y
                         ),
                         radius = editedCircle.radius,
@@ -77,10 +80,13 @@ fun CircleEditPanel(
             OutlinedTextField(
                 value = String.format("%.0f", editedCircle.center.y),
                 onValueChange = {
+                    var newValue = it
+                    if(newValue.isEmpty()) newValue = "0"
+
                     val newCircle = Circle(
                         center = DrawPoint(
                             x = editedCircle.center.x,
-                            y = it.toFloat()
+                            y = newValue.toFloat()
                         ),
                         radius = editedCircle.radius,
                         color = editedCircle.color
@@ -104,12 +110,14 @@ fun CircleEditPanel(
             OutlinedTextField(
                 value = String.format("%.0f", editedCircle.radius),
                 onValueChange = {
+                    var newValue = it
+                    if(newValue.isEmpty()) newValue = "0"
                     val newCircle = Circle(
                         center = DrawPoint(
                             x = editedCircle.center.x,
                             y = editedCircle.center.y
                         ),
-                        radius = it.toFloat(),
+                        radius = newValue.toFloat(),
                         color = editedCircle.color
                     )
                     onChangeDetails(newCircle)

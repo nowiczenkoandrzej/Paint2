@@ -4,18 +4,29 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -35,15 +46,15 @@ fun DrawingArea(
     onDrag: (Offset) -> Unit,
     elements: List<Element> = emptyList(),
     lastTouchPoint: DrawPoint?,
-    dragPaintElement: DrawDetails?,
+    selectedElementIndex: Int? = null
 ) {
     val textMeasurer = rememberTextMeasurer()
-
 
     Canvas(
         modifier = modifier
             .padding(4.dp)
-            .fillMaxSize()
+            .fillMaxWidth()
+            .aspectRatio(1f)
             .pointerInput(Unit) {
 
                 detectTapGestures(
@@ -79,7 +90,8 @@ fun DrawingArea(
             val details = it.draw()
             drawElement(
                 details = details,
-                scope = this
+                scope = this,
+                selectedElementIndex = selectedElementIndex
             )
 
         }
@@ -89,14 +101,8 @@ fun DrawingArea(
                 color = Color.Black,
                 radius = 8f
             )
-        }
-        if(dragPaintElement != null) {
-            drawElement(
-                details = dragPaintElement,
-                scope = this
-            )
-        }
 
+        }
     }
 }
 
@@ -112,7 +118,8 @@ private fun calculateSize(p1: DrawPoint, p2: DrawPoint): Size {
 
 fun drawElement(
     details: DrawDetails,
-    scope: DrawScope
+    scope: DrawScope,
+    selectedElementIndex: Int?
 ) {
     when(details) {
         is DrawDetails.Circle -> {
@@ -154,6 +161,15 @@ fun drawElement(
                     style = Stroke(
                         width = 4f
                     )
+                )
+            }
+        }
+
+        is DrawDetails.Image -> {
+            scope.clipRect {
+                drawImage(
+                    image = details.bitmap.asImageBitmap(),
+                    topLeft = details.p1.toOffset(),
                 )
             }
         }

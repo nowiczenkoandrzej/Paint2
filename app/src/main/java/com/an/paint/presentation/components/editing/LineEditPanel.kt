@@ -58,9 +58,12 @@ fun LineEditPanel(
             OutlinedTextField(
                 value = String.format("%.0f", editedLine.start.x),
                 onValueChange = {
+                    var newValue = it
+                    if(newValue.isEmpty()) newValue = "0"
+
                     val newLine = Line(
                         start = DrawPoint(
-                            x = it.toFloat(),
+                            x = newValue.toFloat(),
                             y = editedLine.start.y
                         ),
                         end = editedLine.end,
@@ -77,10 +80,13 @@ fun LineEditPanel(
             OutlinedTextField(
                 value = String.format("%.0f", editedLine.start.y),
                 onValueChange = {
+                    var newValue = it
+                    if(newValue.isEmpty()) newValue = "0"
+
                     val newLine = Line(
                         start = DrawPoint(
                             x = editedLine.start.x,
-                            y = it.toFloat()
+                            y = newValue.toFloat()
                         ),
                         end = editedLine.end,
                         color = editedLine.color
@@ -104,10 +110,13 @@ fun LineEditPanel(
             OutlinedTextField(
                 value = String.format("%.0f", editedLine.end.x),
                 onValueChange = {
+                    var newValue = it
+                    if(newValue.isEmpty()) newValue = "0"
+
                     val newLine = Line(
                         start = editedLine.start,
                         end = DrawPoint(
-                            x = it.toFloat(),
+                            x = newValue.toFloat(),
                             y = editedLine.end.y
                         ),
                         color = editedLine.color
@@ -123,11 +132,14 @@ fun LineEditPanel(
             OutlinedTextField(
                 value = String.format("%.0f", editedLine.end.y),
                 onValueChange = {
+                    var newValue = it
+                    if(newValue.isEmpty()) newValue = "0"
+
                     val newLine = Line(
                         start = editedLine.start,
                         end = DrawPoint(
                             x = editedLine.end.x,
-                            y = it.toFloat()
+                            y = newValue.toFloat()
                         ),
                         color = editedLine.color
                     )

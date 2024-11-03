@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.DrawPoint
+import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.util.Element
@@ -72,6 +73,16 @@ class PaintViewModel(
                     elements = newList,
                     selectedElement = action.newElement
                 ) }
+            }
+
+            is PaintAction.AddImage -> {
+                _state.update { it.copy(
+                    elements = state.value.elements + Image(
+                        topLeft = DrawPoint(x = 0f, y = 0f),
+                        bottomRight = action.size,
+                        bitmap = action.bitmap
+                    )
+                )}
             }
         }
     }
@@ -187,6 +198,16 @@ class PaintViewModel(
                         y = (state.value.selectedElement as Rectangle).bottomRight.y + offset.y
                     ),
                     color = (state.value.selectedElement as Rectangle).color
+                )
+            }
+            is Image -> {
+                Image(
+                    topLeft = DrawPoint(
+                        x = (state.value.selectedElement as Image).topLeft.x + offset.x,
+                        y = (state.value.selectedElement as Image).topLeft.y + offset.y
+                    ),
+                    bottomRight = (state.value.selectedElement as Image).bottomRight,
+                    bitmap = (state.value.selectedElement as Image).bitmap
                 )
             }
 
