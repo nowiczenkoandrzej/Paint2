@@ -13,10 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.an.paint.domain.FilterType
 import com.an.paint.domain.model.Circle
+import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.util.Element
+import com.an.paint.presentation.PaintAction
 import com.an.paint.presentation.components.editing.CircleEditPanel
 import com.an.paint.presentation.components.editing.LineEditPanel
 import com.an.paint.presentation.components.editing.RectangleEditPanel
@@ -28,6 +31,7 @@ fun SelectedElementEditPanel(
     modifier: Modifier = Modifier,
     onSubmit: () -> Unit,
     onChangeDetails: (Element) -> Unit,
+    onApplyFilter: (FilterType) -> Unit
 ) {
 
     Column(
@@ -60,6 +64,12 @@ fun SelectedElementEditPanel(
                 RectangleEditPanel(
                     onChangeDetails = { onChangeDetails(it)},
                     editedRectangle = element
+                )
+            }
+            is Image -> {
+                ImageEditPanel(
+                    onChangeDetails = { onApplyFilter(it) },
+                    editedImage = element
                 )
             }
         }

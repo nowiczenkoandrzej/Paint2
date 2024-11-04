@@ -108,6 +108,9 @@ fun PaintScreen(
                     },
                     onChangeDetails = {
                         viewModel.onAction(PaintAction.EditElement(it))
+                    },
+                    onApplyFilter = {
+                        viewModel.onAction(PaintAction.ApplyFilter(it))
                     }
                 )
             }

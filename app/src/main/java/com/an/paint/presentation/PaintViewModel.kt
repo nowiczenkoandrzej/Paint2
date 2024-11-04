@@ -1,22 +1,27 @@
 package com.an.paint.presentation
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.an.paint.domain.FilterType
 import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.DrawPoint
 import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
+import com.an.paint.domain.ImageProcessor
 import com.an.paint.domain.util.Element
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 class PaintViewModel(
-
+    private val imageProcessor: ImageProcessor
 ): ViewModel() {
 
     private val _state = MutableStateFlow(PaintState())
@@ -61,18 +66,10 @@ class PaintViewModel(
                     selectedElementIndex = null
                 )}
 
-                Log.d("TAG", "PaintScreen viewModel: ${state.value}")
             }
 
             is PaintAction.EditElement -> {
-                val newList = state.value.elements.toMutableList().apply {
-                    this[state.value.selectedElementIndex!!] = action.newElement
-                }.toList()
-
-                _state.update { it.copy(
-                    elements = newList,
-                    selectedElement = action.newElement
-                ) }
+                updateList(action.newElement)
             }
 
             is PaintAction.AddImage -> {
@@ -83,6 +80,35 @@ class PaintViewModel(
                         bitmap = action.bitmap
                     )
                 )}
+            }
+
+            is PaintAction.ApplyFilter -> {
+                applyFilter(action.filter)
+            }
+        }
+    }
+
+    private fun applyFilter(filter: FilterType) {
+        if(state.value.selectedElement is Image) {
+            viewModelScope.launch {
+
+                val oldBitmap = (state.value.selectedElement as Image).bitmap
+
+                val newBitmap = when(filter) {
+                    FilterType.Dilate -> imageProcessor.dilate(oldBitmap)
+                    FilterType.Erode -> imageProcessor.erode(oldBitmap)
+                    FilterType.Median -> imageProcessor.medianFilter(oldBitmap)
+                    FilterType.Smooth -> imageProcessor.smoothingFilter(oldBitmap)
+                    FilterType.Sobel -> imageProcessor.sobelFilter(oldBitmap)
+                }
+
+                val newImage = Image(
+                    topLeft = (state.value.selectedElement as Image).topLeft,
+                    bottomRight = (state.value.selectedElement as Image).bottomRight,
+                    bitmap = newBitmap
+                )
+
+                updateList(newImage)
             }
         }
     }
@@ -163,7 +189,7 @@ class PaintViewModel(
 
     private fun dragElement(offset: Offset) {
 
-        var newElement = when(state.value.selectedElement) {
+        val newElement = when(state.value.selectedElement) {
             is Line -> {
                 Line(
                     start = DrawPoint(
@@ -216,8 +242,14 @@ class PaintViewModel(
             }
         }
 
+        updateList(newElement!!)
+
+
+    }
+
+    private fun updateList(newElement: Element){
         val newList = state.value.elements.toMutableList().apply {
-            this[state.value.selectedElementIndex!!] = newElement!!
+            this[state.value.selectedElementIndex!!] = newElement
         }.toList()
 
         _state.update { it.copy(
