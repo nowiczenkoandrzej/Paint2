@@ -1,6 +1,7 @@
 package com.an.paint.domain.model
 
 import android.graphics.Bitmap
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import com.an.paint.domain.util.Element
@@ -27,6 +28,14 @@ data class Image(
                 (point.y > topLeft.y && point.y < bottomRight.y)
 
         return xCorrect && yCorrect
+    }
+
+    override fun move(offset: Offset): Element {
+        return Image(
+            topLeft = this.topLeft.move(offset) as DrawPoint,
+            bottomRight = this.topLeft.move(offset) as DrawPoint,
+            bitmap = this.bitmap
+        )
     }
 
 }

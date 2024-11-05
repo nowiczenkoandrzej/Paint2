@@ -1,5 +1,6 @@
 package com.an.paint.domain.model
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.util.Element
 
@@ -20,5 +21,13 @@ class Rectangle(
                 (point.y > topLeft.y && point.y < bottomRight.y)
 
         return xCorrect && yCorrect
+    }
+
+    override fun move(offset: Offset): Element {
+        return Rectangle(
+            topLeft = this.topLeft.move(offset) as DrawPoint,
+            bottomRight = this.bottomRight.move(offset) as DrawPoint,
+            color = this.color
+        )
     }
 }

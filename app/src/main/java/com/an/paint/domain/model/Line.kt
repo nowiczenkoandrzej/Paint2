@@ -1,5 +1,6 @@
 package com.an.paint.domain.model
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.util.Element
 import kotlin.IllegalArgumentException
@@ -29,6 +30,14 @@ class Line(
             e.printStackTrace()
             return false
         }
+    }
+
+    override fun move(offset: Offset): Element {
+        return Line(
+            start = this.start.move(offset) as DrawPoint,
+            end = this.end.move(offset) as DrawPoint,
+            color = this.color
+        )
     }
 
     private fun linearFunction(p1: DrawPoint, p2: DrawPoint): Pair<Float, Float> {

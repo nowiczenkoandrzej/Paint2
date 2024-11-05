@@ -1,5 +1,6 @@
 package com.an.paint.domain.model
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.util.Element
 import kotlin.math.pow
@@ -16,6 +17,14 @@ class Circle(
 
     override fun containsTouchPoint(point: DrawPoint): Boolean {
         return calculateRadius(center, point) <= radius
+    }
+
+    override fun move(offset: Offset): Element {
+        return Circle(
+            center = center.move(offset) as DrawPoint,
+            radius = this.radius,
+            color = this.color
+        )
     }
 
     private fun calculateRadius(p1: DrawPoint, p2: DrawPoint): Float {

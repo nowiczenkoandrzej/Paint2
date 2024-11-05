@@ -189,60 +189,11 @@ class PaintViewModel(
 
     private fun dragElement(offset: Offset) {
 
-        val newElement = when(state.value.selectedElement) {
-            is Line -> {
-                Line(
-                    start = DrawPoint(
-                        x = (state.value.selectedElement as Line).start.x + offset.x,
-                        y = (state.value.selectedElement as Line).start.y + offset.y
-                    ),
-                    end = DrawPoint(
-                        x = (state.value.selectedElement as Line).end.x + offset.x,
-                        y = (state.value.selectedElement as Line).end.y + offset.y
-                    ),
-                    color = (state.value.selectedElement as Line).color
-                )
-            }
-            is Circle -> {
-                Circle(
-                    center = DrawPoint(
-                        x = (state.value.selectedElement as Circle).center.x + offset.x,
-                        y = (state.value.selectedElement as Circle).center.y + offset.y
-                    ),
-                    radius = (state.value.selectedElement as Circle).radius,
-                    color = (state.value.selectedElement as Circle).color
-                )
-            }
-            is Rectangle -> {
-                Rectangle(
-                    topLeft = DrawPoint(
-                        x = (state.value.selectedElement as Rectangle).topLeft.x + offset.x,
-                        y = (state.value.selectedElement as Rectangle).topLeft.y + offset.y
-                    ),
-                    bottomRight = DrawPoint(
-                        x = (state.value.selectedElement as Rectangle).bottomRight.x + offset.x,
-                        y = (state.value.selectedElement as Rectangle).bottomRight.y + offset.y
-                    ),
-                    color = (state.value.selectedElement as Rectangle).color
-                )
-            }
-            is Image -> {
-                Image(
-                    topLeft = DrawPoint(
-                        x = (state.value.selectedElement as Image).topLeft.x + offset.x,
-                        y = (state.value.selectedElement as Image).topLeft.y + offset.y
-                    ),
-                    bottomRight = (state.value.selectedElement as Image).bottomRight,
-                    bitmap = (state.value.selectedElement as Image).bitmap
-                )
-            }
+        if(state.value.selectedElement == null) return
 
-            else -> {
-                state.value.selectedElement
-            }
-        }
+        val newElement = state.value.selectedElement!!.move(offset)
 
-        updateList(newElement!!)
+        updateList(newElement)
 
 
     }

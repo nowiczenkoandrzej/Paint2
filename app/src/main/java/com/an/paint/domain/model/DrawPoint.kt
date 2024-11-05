@@ -17,6 +17,13 @@ class DrawPoint(
         return false
     }
 
+    override fun move(offset: Offset): Element {
+        return DrawPoint(
+            x = this.x + offset.x,
+            y = this.y + offset.y
+        )
+    }
+
     fun isXBetween(p1: DrawPoint, p2: DrawPoint): Boolean {
         return (p1.x < x && p2.x > x) ||
                 (p2.x < x && p1.x > x)
