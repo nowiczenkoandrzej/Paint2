@@ -1,6 +1,5 @@
 package com.an.paint.presentation
 
-import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
@@ -13,10 +12,12 @@ import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.ImageProcessor
 import com.an.paint.domain.util.Element
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -46,11 +47,6 @@ class PaintViewModel(
                 }
             }
 
-            is PaintAction.DragElement -> {
-                if(state.value.isInEditMode && state.value.selectedElement != null)
-                    dragElement(action.offset)
-            }
-
             is PaintAction.PickColor -> {
                 _state.update { it.copy(
                     selectedColor = action.color,
@@ -75,7 +71,7 @@ class PaintViewModel(
             is PaintAction.AddImage -> {
                 _state.update { it.copy(
                     elements = state.value.elements + Image(
-                        topLeft = DrawPoint(x = 0f, y = 0f),
+                        p1 = DrawPoint(x = 0f, y = 0f),
                         bottomRight = action.size,
                         bitmap = action.bitmap
                     )
@@ -84,6 +80,15 @@ class PaintViewModel(
 
             is PaintAction.ApplyFilter -> {
                 applyFilter(action.filter)
+            }
+
+            is PaintAction.TransformElement -> {
+
+                if(state.value.selectedElement == null) return
+
+                val newElement = state.value.selectedElement!!.transform(action.zoom, action.rotation, action.offset)
+
+                updateList(newElement)
             }
         }
     }
@@ -94,20 +99,20 @@ class PaintViewModel(
 
                 val oldBitmap = (state.value.selectedElement as Image).bitmap
 
-                val newBitmap = when(filter) {
-                    FilterType.Dilate -> imageProcessor.dilate(oldBitmap)
-                    FilterType.Erode -> imageProcessor.erode(oldBitmap)
-                    FilterType.Median -> imageProcessor.medianFilter(oldBitmap)
-                    FilterType.Smooth -> imageProcessor.smoothingFilter(oldBitmap)
-                    FilterType.Sobel -> imageProcessor.sobelFilter(oldBitmap)
+                val newBitmap = withContext(Dispatchers.IO) {
+                    when(filter) {
+                        FilterType.Dilate -> imageProcessor.dilate(oldBitmap)
+                        FilterType.Erode -> imageProcessor.erode(oldBitmap)
+                        FilterType.Median -> imageProcessor.medianFilter(oldBitmap)
+                        FilterType.Smooth -> imageProcessor.smoothingFilter(oldBitmap)
+                        FilterType.Sobel -> imageProcessor.sobelFilter(oldBitmap)
+                    }
                 }
-
                 val newImage = Image(
-                    topLeft = (state.value.selectedElement as Image).topLeft,
+                    p1 = (state.value.selectedElement as Image).p1,
                     bottomRight = (state.value.selectedElement as Image).bottomRight,
                     bitmap = newBitmap
                 )
-
                 updateList(newImage)
             }
         }
@@ -124,7 +129,7 @@ class PaintViewModel(
                     val helperPoint = state.value.helperPoint!!
                     _state.update { it.copy(
                         elements = state.value.elements + Line(
-                            start = helperPoint,
+                            p1 = helperPoint,
                             end = p1,
                             color = state.value.selectedColor
                         ),
@@ -141,7 +146,7 @@ class PaintViewModel(
                     val helperPoint = state.value.helperPoint!!
                     _state.update { it.copy(
                         elements = state.value.elements + Circle(
-                            center = helperPoint,
+                            p1 = helperPoint,
                             radius = calculateRadius(helperPoint, p1),
                             color = state.value.selectedColor
                         ),
@@ -158,14 +163,13 @@ class PaintViewModel(
                     val helperPoint = state.value.helperPoint!!
                     _state.update { it.copy(
                         elements = state.value.elements + Rectangle(
-                            topLeft = helperPoint,
+                            p1 = helperPoint,
                             bottomRight = p1,
                             color = state.value.selectedColor
                         ),
                         helperPoint = null
                     )}
                 }
-
             }
         }
 
@@ -185,17 +189,6 @@ class PaintViewModel(
 
     private fun calculateRadius(p1: DrawPoint, p2: DrawPoint): Float {
         return sqrt((p2.x - p1.x).pow(2) + (p2.y - p1.y).pow(2))
-    }
-
-    private fun dragElement(offset: Offset) {
-
-        if(state.value.selectedElement == null) return
-
-        val newElement = state.value.selectedElement!!.move(offset)
-
-        updateList(newElement)
-
-
     }
 
     private fun updateList(newElement: Element){

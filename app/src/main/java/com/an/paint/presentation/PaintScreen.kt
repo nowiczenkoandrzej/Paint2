@@ -94,8 +94,9 @@ fun PaintScreen(
             },
             elements = state.elements,
             lastTouchPoint = state.helperPoint,
-            onDrag = {
-                     viewModel.onAction(PaintAction.DragElement(it))
+
+            onTransform = { zoom, rotation, offset ->
+                viewModel.onAction(PaintAction.TransformElement(zoom, rotation, offset))
             }
         )
         Spacer(modifier = Modifier.weight(1f))

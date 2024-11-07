@@ -8,9 +8,12 @@ import com.an.paint.domain.model.DrawPoint
 interface Element {
 
     val color: Color
+    val rotationAngle: Float
+    val p1: DrawPoint?
+    val zoom: Float
 
     fun draw(): DrawDetails
-
     fun containsTouchPoint(point: DrawPoint): Boolean
-    fun move(offset: Offset): Element
+    fun changeColor(color: Color): Element
+    fun transform(zoom: Float, rotation: Float, offset: Offset): Element
 }

@@ -4,11 +4,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.util.Element
 
-class DrawPoint(
+data class DrawPoint(
     val x: Float,
     val y: Float,
-    override val color: Color = Color.Black
+    override val color: Color = Color.Black,
+    override val rotationAngle: Float = 0f,
+    override val zoom: Float = 1f
 ): Element {
+    override val p1: DrawPoint? = null
     override fun draw(): DrawDetails {
         return DrawDetails.Point(p1 = DrawPoint(x = x, y = y, color = color))
     }
@@ -17,10 +20,14 @@ class DrawPoint(
         return false
     }
 
-    override fun move(offset: Offset): Element {
-        return DrawPoint(
-            x = this.x + offset.x,
-            y = this.y + offset.y
+    override fun changeColor(color: Color): Element {
+        return this
+    }
+
+    override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
+        return this.copy(
+            x = x + offset.x,
+            y = y + offset.y
         )
     }
 

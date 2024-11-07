@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +26,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -43,12 +48,13 @@ import kotlin.math.roundToInt
 fun DrawingArea(
     modifier: Modifier = Modifier,
     onTap: (Offset) -> Unit,
-    onDrag: (Offset) -> Unit,
     elements: List<Element> = emptyList(),
     lastTouchPoint: DrawPoint?,
-    selectedElementIndex: Int? = null
+    selectedElementIndex: Int? = null,
+    onTransform: (Float, Float, Offset) -> Unit
 ) {
     val textMeasurer = rememberTextMeasurer()
+
 
     Canvas(
         modifier = modifier
@@ -62,12 +68,12 @@ fun DrawingArea(
                         onTap(tapOffset)
                     },
                 )
+
             }
             .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    onDrag(dragAmount)
-
-                    Log.d("TAG", "DrawingArea: ${dragAmount.x} -- ${dragAmount.y}")
+                detectTransformGestures { centroid, pan, zoom, rotation ->
+                    onTransform(zoom, rotation, pan)
+                    Log.d("TAG", "DrawingArea: zoom: $zoom, rotation: $rotation, centroid: $centroid, pan: $pan")
                 }
             }
             .drawBehind {
@@ -86,13 +92,26 @@ fun DrawingArea(
             }
 
     ) {
+
         elements.forEach {
             val details = it.draw()
-            drawElement(
-                details = details,
-                scope = this,
-                selectedElementIndex = selectedElementIndex
-            )
+            clipRect {
+                withTransform({
+                    if(it.p1 == null) return@withTransform
+                    rotate(
+                        degrees = it.rotationAngle,
+                        pivot = it.p1!!.toOffset()
+                    )
+                    scale(it.zoom)
+                }) {
+                        drawElement(
+                            details = details,
+                            scope = this,
+                            selectedElementIndex = selectedElementIndex
+                        )
+
+                }
+            }
 
         }
         if(lastTouchPoint != null) {
@@ -121,28 +140,31 @@ fun drawElement(
     scope: DrawScope,
     selectedElementIndex: Int?
 ) {
+
+
+
     when(details) {
         is DrawDetails.Circle -> {
-            scope.clipRect {
-                drawCircle(
-                    center = details.p1.toOffset(),
-                    radius = details.radius,
-                    color = details.color,
-                    style = Stroke(
-                        width = 4f
-                    )
-                )
-            }
+
+
+            scope.drawCircle(
+                center = details.p1.toOffset(),
+                radius = details.radius,
+                color = details.color,
+                style = Stroke(
+                    width = 4f
+                ),
+            )
+
         }
         is DrawDetails.Line -> {
-            scope.clipRect {
-                drawLine(
-                    color = details.color,
-                    start = details.p1.toOffset(),
-                    end = details.p2.toOffset(),
-                    strokeWidth = 4f
-                )
-            }
+            scope.drawLine(
+                color = details.color,
+                start = details.p1.toOffset(),
+                end = details.p2.toOffset(),
+                strokeWidth = 4f
+            )
+
         }
         is DrawDetails.Point -> {
             scope.drawCircle(
@@ -153,25 +175,22 @@ fun drawElement(
             Log.d("TAG", "onCreate: $details")
         }
         is DrawDetails.Rectangle -> {
-            scope.clipRect {
-                drawRect(
-                    topLeft = details.p1.toOffset(),
-                    size = calculateSize(details.p1, details.p2),
-                    color = details.color,
-                    style = Stroke(
-                        width = 4f
-                    )
+            scope.drawRect(
+                topLeft = details.p1.toOffset(),
+                size = calculateSize(details.p1, details.p2),
+                color = details.color,
+                style = Stroke(
+                    width = 4f
                 )
-            }
+            )
         }
 
         is DrawDetails.Image -> {
-            scope.clipRect {
-                drawImage(
-                    image = details.bitmap.asImageBitmap(),
-                    topLeft = details.p1.toOffset(),
-                )
-            }
+            scope.drawImage(
+                image = details.bitmap.asImageBitmap(),
+                topLeft = details.p1.toOffset(),
+
+            )
         }
     }
 

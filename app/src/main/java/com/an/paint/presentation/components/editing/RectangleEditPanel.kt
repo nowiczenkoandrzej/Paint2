@@ -52,15 +52,15 @@ fun RectangleEditPanel(
             Spacer(modifier = Modifier.width(8.dp))
 
             OutlinedTextField(
-                value = String.format("%.0f", editedRectangle.topLeft.x),
+                value = String.format("%.0f", editedRectangle.p1.x),
                 onValueChange = {
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newRectangle = Rectangle(
-                        topLeft = DrawPoint(
+                        p1 = DrawPoint(
                             x = newValue.toFloat(),
-                            y = editedRectangle.topLeft.y
+                            y = editedRectangle.p1.y
                         ),
                         bottomRight = editedRectangle.bottomRight,
                         color = editedRectangle.color
@@ -74,14 +74,14 @@ fun RectangleEditPanel(
             Spacer(modifier = Modifier.width(8.dp))
 
             OutlinedTextField(
-                value = String.format("%.0f", editedRectangle.topLeft.y),
+                value = String.format("%.0f", editedRectangle.p1.y),
                 onValueChange = {
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newRectangle = Rectangle(
-                        topLeft = DrawPoint(
-                            x = editedRectangle.topLeft.x,
+                        p1 = DrawPoint(
+                            x = editedRectangle.p1.x,
                             y = newValue.toFloat()
                         ),
                         bottomRight = editedRectangle.bottomRight,
@@ -109,7 +109,7 @@ fun RectangleEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newRectangle = Rectangle(
-                        topLeft = editedRectangle.topLeft,
+                        p1 = editedRectangle.p1,
                         bottomRight = DrawPoint(
                             x = newValue.toFloat(),
                             y = editedRectangle.bottomRight.y
@@ -131,7 +131,7 @@ fun RectangleEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newRectangle = Rectangle(
-                        topLeft = editedRectangle.topLeft,
+                        p1 = editedRectangle.p1,
                         bottomRight = DrawPoint(
                             x = editedRectangle.bottomRight.x,
                             y = newValue.toFloat()
@@ -183,7 +183,7 @@ fun RectangleEditPanel(
                 ColorPicker(
                     onColorSelected = {
                         val newRectangle = Rectangle(
-                            topLeft = editedRectangle.topLeft,
+                            p1 = editedRectangle.p1,
                             bottomRight = editedRectangle.bottomRight,
                             color = it
                         )

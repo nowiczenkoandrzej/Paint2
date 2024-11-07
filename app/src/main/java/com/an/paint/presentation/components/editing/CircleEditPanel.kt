@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.DrawPoint
-import com.an.paint.domain.model.Line
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,15 +55,15 @@ fun CircleEditPanel(
             Spacer(modifier = Modifier.width(8.dp))
 
             OutlinedTextField(
-                value = String.format("%.0f", editedCircle.center.x),
+                value = String.format("%.0f", editedCircle.p1.x),
                 onValueChange = {
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newCircle = Circle(
-                        center = DrawPoint(
+                        p1 = DrawPoint(
                             x = newValue.toFloat(),
-                            y = editedCircle.center.y
+                            y = editedCircle.p1.y
                         ),
                         radius = editedCircle.radius,
                         color = editedCircle.color
@@ -78,14 +77,14 @@ fun CircleEditPanel(
             Spacer(modifier = Modifier.width(8.dp))
 
             OutlinedTextField(
-                value = String.format("%.0f", editedCircle.center.y),
+                value = String.format("%.0f", editedCircle.p1.y),
                 onValueChange = {
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newCircle = Circle(
-                        center = DrawPoint(
-                            x = editedCircle.center.x,
+                        p1 = DrawPoint(
+                            x = editedCircle.p1.x,
                             y = newValue.toFloat()
                         ),
                         radius = editedCircle.radius,
@@ -113,9 +112,9 @@ fun CircleEditPanel(
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
                     val newCircle = Circle(
-                        center = DrawPoint(
-                            x = editedCircle.center.x,
-                            y = editedCircle.center.y
+                        p1 = DrawPoint(
+                            x = editedCircle.p1.x,
+                            y = editedCircle.p1.y
                         ),
                         radius = newValue.toFloat(),
                         color = editedCircle.color
@@ -164,7 +163,7 @@ fun CircleEditPanel(
                 ColorPicker(
                     onColorSelected = {
                         val newCircle = Circle(
-                            center = editedCircle.center,
+                            p1 = editedCircle.p1,
                             radius = editedCircle.radius,
                             color = it
                         )

@@ -6,20 +6,27 @@ import com.an.paint.domain.util.Element
 import kotlin.IllegalArgumentException
 import kotlin.math.abs
 
-class Line(
-    val start: DrawPoint,
+data class Line(
+    override val p1: DrawPoint,
     val end: DrawPoint,
-    override val color: Color
+    override val color: Color,
+    override val rotationAngle: Float = 0f,
+    override val zoom: Float = 1f
 ): Element {
     override fun draw(): DrawDetails {
-        return DrawDetails.Line(p1 = start, p2 = end, color = color)
+        return DrawDetails.Line(
+            p1 = p1,
+            p2 = end,
+            color = color,
+            zoom = zoom
+        )
     }
 
     override fun containsTouchPoint(point: DrawPoint): Boolean {
         try {
-            val (a, b) = linearFunction(start, end)
+            val (a, b) = linearFunction(p1, end)
 
-            if(!point.isXBetween(start, end))
+            if(!point.isXBetween(p1, end))
                 return false
 
             val tolerance = 20f
@@ -32,11 +39,28 @@ class Line(
         }
     }
 
-    override fun move(offset: Offset): Element {
-        return Line(
-            start = this.start.move(offset) as DrawPoint,
-            end = this.end.move(offset) as DrawPoint,
-            color = this.color
+    override fun changeColor(color: Color): Element {
+        return this.copy(
+            color = color
+        )
+    }
+
+    override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
+        val width = abs(p1.x - end.x) * zoom
+        val height = abs(p1.y - end.y) * zoom
+
+        val newPoint = DrawPoint(
+            x = p1.x + offset.x,
+            y = p1.y + offset.y
+        )
+
+        return this.copy(
+            rotationAngle = rotationAngle + rotation,
+            p1 = newPoint,
+            end = DrawPoint(
+                x = newPoint.x + width,
+                y = newPoint.y + height
+            )
         )
     }
 

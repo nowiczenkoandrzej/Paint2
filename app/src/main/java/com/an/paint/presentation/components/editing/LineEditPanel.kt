@@ -34,7 +34,6 @@ import androidx.compose.ui.window.Popup
 import com.an.paint.domain.model.DrawPoint
 
 import com.an.paint.domain.model.Line
-import com.an.paint.domain.model.Rectangle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,15 +55,15 @@ fun LineEditPanel(
             Spacer(modifier = Modifier.width(8.dp))
 
             OutlinedTextField(
-                value = String.format("%.0f", editedLine.start.x),
+                value = String.format("%.0f", editedLine.p1.x),
                 onValueChange = {
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newLine = Line(
-                        start = DrawPoint(
+                        p1 = DrawPoint(
                             x = newValue.toFloat(),
-                            y = editedLine.start.y
+                            y = editedLine.p1.y
                         ),
                         end = editedLine.end,
                         color = editedLine.color
@@ -78,14 +77,14 @@ fun LineEditPanel(
             Spacer(modifier = Modifier.width(8.dp))
 
             OutlinedTextField(
-                value = String.format("%.0f", editedLine.start.y),
+                value = String.format("%.0f", editedLine.p1.y),
                 onValueChange = {
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newLine = Line(
-                        start = DrawPoint(
-                            x = editedLine.start.x,
+                        p1 = DrawPoint(
+                            x = editedLine.p1.x,
                             y = newValue.toFloat()
                         ),
                         end = editedLine.end,
@@ -114,7 +113,7 @@ fun LineEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newLine = Line(
-                        start = editedLine.start,
+                        p1 = editedLine.p1,
                         end = DrawPoint(
                             x = newValue.toFloat(),
                             y = editedLine.end.y
@@ -136,7 +135,7 @@ fun LineEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newLine = Line(
-                        start = editedLine.start,
+                        p1 = editedLine.p1,
                         end = DrawPoint(
                             x = editedLine.end.x,
                             y = newValue.toFloat()
@@ -189,7 +188,7 @@ fun LineEditPanel(
                 ColorPicker(
                     onColorSelected = {
                         val newLine = Line(
-                            start = editedLine.start,
+                            p1 = editedLine.p1,
                             end = editedLine.end,
                             color = it
                         )
