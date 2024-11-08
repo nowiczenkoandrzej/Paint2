@@ -37,10 +37,13 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.DrawDetails
-import com.an.paint.domain.model.DrawPoint
-import com.an.paint.domain.model.toOffset
+import com.an.paint.domain.model.Image
+import com.an.paint.domain.model.Line
+import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.util.Element
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
@@ -49,7 +52,7 @@ fun DrawingArea(
     modifier: Modifier = Modifier,
     onTap: (Offset) -> Unit,
     elements: List<Element> = emptyList(),
-    lastTouchPoint: DrawPoint?,
+    lastTouchPoint: Offset?,
     selectedElementIndex: Int? = null,
     onTransform: (Float, Float, Offset) -> Unit
 ) {
@@ -73,7 +76,10 @@ fun DrawingArea(
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, rotation ->
                     onTransform(zoom, rotation, pan)
-                    Log.d("TAG", "DrawingArea: zoom: $zoom, rotation: $rotation, centroid: $centroid, pan: $pan")
+                    Log.d(
+                        "TAG",
+                        "DrawingArea: zoom: $zoom, rotation: $rotation, centroid: $centroid, pan: $pan"
+                    )
                 }
             }
             .drawBehind {
@@ -93,21 +99,29 @@ fun DrawingArea(
 
     ) {
 
-        elements.forEach {
-            val details = it.draw()
+        elements.forEachIndexed { index, element ->
+            val details = element.draw()
             clipRect {
                 withTransform({
-                    if(it.p1 == null) return@withTransform
+                    if(element.p1 == null) return@withTransform
+
                     rotate(
-                        degrees = it.rotationAngle,
-                        pivot = it.p1!!.toOffset()
+                        degrees = element.rotationAngle,
+                        pivot = calculatePivot(element)
                     )
-                    scale(it.zoom)
+
+                    val scale = if(element is Image) element.zoom else 1f
+
+                    scale(
+                        scale = scale,
+                        pivot = element.p1!!
+                    )
                 }) {
                         drawElement(
                             details = details,
                             scope = this,
-                            selectedElementIndex = selectedElementIndex
+                            selectedElementIndex = selectedElementIndex,
+                            currentElementIndex = index
                         )
 
                 }
@@ -116,7 +130,7 @@ fun DrawingArea(
         }
         if(lastTouchPoint != null) {
             drawCircle(
-                center = lastTouchPoint.toOffset(),
+                center = lastTouchPoint,
                 color = Color.Black,
                 radius = 8f
             )
@@ -125,7 +139,7 @@ fun DrawingArea(
     }
 }
 
-private fun calculateSize(p1: DrawPoint, p2: DrawPoint): Size {
+private fun calculateSize(p1: Offset, p2: Offset): Size {
     val width = p2.x - p1.x
     val height = p2.y - p1.y
     return Size(
@@ -134,62 +148,110 @@ private fun calculateSize(p1: DrawPoint, p2: DrawPoint): Size {
     )
 }
 
+private fun calculatePivot(element: Element): Offset {
+    return when(element) {
+        is Image -> {
+            val height = abs(element.bottomRight.y - element.p1.y)
+            val width = abs(element.bottomRight.x - element.p1.x)
 
-fun drawElement(
+            Offset(
+                x = width / 2 + element.p1.x,
+                y = height / 2 + element.p1.y
+            )
+        }
+        is Rectangle -> {
+            val height = abs(element.bottomRight.y - element.p1.y) * element.zoom
+            val width = abs(element.bottomRight.x - element.p1.x) * element.zoom
+
+            Offset(
+                x = width / 2 + element.p1.x,
+                y = height / 2 + element.p1.y
+            )
+        }
+        is Circle -> {
+            element.p1
+        }
+        is Line -> {
+            val height = abs(element.end.y - element.p1.y) * element.zoom
+            val width = abs(element.end.x - element.p1.x) * element.zoom
+
+            Offset(
+                x = width / 2 + element.p1.x,
+                y = height / 2 + element.p1.y
+            )
+
+        }
+
+        else -> {
+            Offset.Zero
+        }
+    }
+}
+
+
+private fun drawElement(
     details: DrawDetails,
     scope: DrawScope,
-    selectedElementIndex: Int?
+    selectedElementIndex: Int?,
+    currentElementIndex: Int
 ) {
 
+    val alpha = if(selectedElementIndex != null && selectedElementIndex != currentElementIndex) 0.6f else  1f
 
+    Log.d("TAG", "drawElement: $selectedElementIndex")
 
     when(details) {
         is DrawDetails.Circle -> {
 
 
+
             scope.drawCircle(
-                center = details.p1.toOffset(),
+                center = details.p1,
                 radius = details.radius,
                 color = details.color,
                 style = Stroke(
                     width = 4f
                 ),
+                alpha = alpha
             )
 
         }
         is DrawDetails.Line -> {
             scope.drawLine(
                 color = details.color,
-                start = details.p1.toOffset(),
-                end = details.p2.toOffset(),
-                strokeWidth = 4f
+                start = details.p1,
+                end = details.p2,
+                strokeWidth = 4f,
+                alpha = alpha
             )
 
         }
         is DrawDetails.Point -> {
             scope.drawCircle(
-                center = details.p1.toOffset(),
+                center = details.p1,
                 color = details.color,
-                radius = 8f
+                radius = 8f,
+                alpha = alpha
             )
             Log.d("TAG", "onCreate: $details")
         }
         is DrawDetails.Rectangle -> {
             scope.drawRect(
-                topLeft = details.p1.toOffset(),
+                topLeft = details.p1,
                 size = calculateSize(details.p1, details.p2),
                 color = details.color,
                 style = Stroke(
                     width = 4f
-                )
+                ),
+                alpha = alpha
             )
         }
 
         is DrawDetails.Image -> {
             scope.drawImage(
                 image = details.bitmap.asImageBitmap(),
-                topLeft = details.p1.toOffset(),
-
+                topLeft = details.p1,
+                alpha = alpha
             )
         }
     }

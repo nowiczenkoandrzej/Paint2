@@ -1,12 +1,13 @@
 package com.an.paint.domain.model
 
 import android.graphics.Bitmap
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 
 sealed class DrawDetails(
-    p1: DrawPoint,
-    p2: DrawPoint? = null,
+    p1: Offset,
+    p2: Offset? = null,
     radius: Float? = null,
     color: Color = Color.Black,
     bitmap: Bitmap? = null,
@@ -14,8 +15,8 @@ sealed class DrawDetails(
     zoom: Float = 1f
 ) {
     data class Line(
-        val p1: DrawPoint,
-        val p2: DrawPoint,
+        val p1: Offset,
+        val p2: Offset,
         val color: Color = Color.Black,
         val rotationAngle: Float = 0f,
         val zoom: Float = 1f
@@ -27,8 +28,8 @@ sealed class DrawDetails(
         zoom = zoom
     )
     data class Rectangle(
-        val p1: DrawPoint,
-        val p2: DrawPoint,
+        val p1: Offset,
+        val p2: Offset,
         val color: Color = Color.Black,
         val rotationAngle: Float = 0f,
         val zoom: Float = 1f
@@ -40,7 +41,7 @@ sealed class DrawDetails(
         zoom = zoom
     )
     data class Circle(
-        val p1: DrawPoint,
+        val p1: Offset,
         val radius: Float,
         val color: Color = Color.Black,
         val rotationAngle: Float = 0f,
@@ -53,7 +54,7 @@ sealed class DrawDetails(
         zoom = zoom
     )
     data class Point(
-        val p1: DrawPoint,
+        val p1: Offset,
         val color: Color = Color.Black,
         val rotationAngle: Float = 0f,
         val zoom: Float = 1f
@@ -65,8 +66,8 @@ sealed class DrawDetails(
     )
 
     data class Image(
-        val p1: DrawPoint,
-        val p2: DrawPoint,
+        val p1: Offset,
+        val p2: Offset,
         val bitmap: Bitmap,
         val rotationAngle: Float = 0f,
         val zoom: Float = 1f

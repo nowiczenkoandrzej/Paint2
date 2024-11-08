@@ -28,11 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.an.paint.domain.model.Circle
-import com.an.paint.domain.model.DrawPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +61,7 @@ fun CircleEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newCircle = Circle(
-                        p1 = DrawPoint(
+                        p1 = Offset(
                             x = newValue.toFloat(),
                             y = editedCircle.p1.y
                         ),
@@ -83,7 +83,7 @@ fun CircleEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newCircle = Circle(
-                        p1 = DrawPoint(
+                        p1 = Offset(
                             x = editedCircle.p1.x,
                             y = newValue.toFloat()
                         ),
@@ -112,7 +112,7 @@ fun CircleEditPanel(
                     var newValue = it
                     if(newValue.isEmpty()) newValue = "0"
                     val newCircle = Circle(
-                        p1 = DrawPoint(
+                        p1 = Offset(
                             x = editedCircle.p1.x,
                             y = editedCircle.p1.y
                         ),

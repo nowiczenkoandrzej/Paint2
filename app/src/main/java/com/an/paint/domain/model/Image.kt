@@ -1,13 +1,15 @@
 package com.an.paint.domain.model
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.util.Element
+import java.lang.Math.abs
 
 data class Image(
-    override val p1: DrawPoint,
-    val bottomRight: DrawPoint,
+    override val p1: Offset,
+    val bottomRight: Offset,
     val bitmap: Bitmap,
     override val color: Color = Color.White,
     override val rotationAngle: Float = 0f,
@@ -22,7 +24,7 @@ data class Image(
         )
     }
 
-    override fun containsTouchPoint(point: DrawPoint): Boolean {
+    override fun containsTouchPoint(point: Offset): Boolean {
         val xCorrect = (point.x > p1.x && point.x < bottomRight.x) ||
                 (point.x > bottomRight.x && point.x < p1.x)
 
@@ -38,25 +40,35 @@ data class Image(
     }
 
     override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
-        val width = (p1.x - bottomRight.x) * zoom
-        val height = (p1.y - bottomRight.y) * zoom
 
-        val newPoint = DrawPoint(
-            x = p1.x + offset.x,
-            y = p1.y + offset.y
+        val center = Offset(
+            x = (p1.x + bottomRight.x) / 2f,
+            y = (p1.y + bottomRight.y) / 2f
         )
 
         var newZoom = this.zoom * zoom
+        newZoom = newZoom.coerceIn(0.1f, 3f)
 
-        if (newZoom > 1f) newZoom = 1f
+        val halfWidth = (bottomRight.x - p1.x) / 2f
+        val halfHeight = (bottomRight.y - p1.y) / 2f
+
+        val newHalfWidth = halfWidth * zoom
+        val newHalfHeight = halfHeight * zoom
+
+        val newP1 = Offset(
+            x = center.x - newHalfWidth + offset.x,
+            y = center.y - newHalfHeight + offset.y
+        )
+
+        val newBottomRight = Offset(
+            x = center.x + newHalfWidth + offset.x,
+            y = center.y + newHalfHeight + offset.y
+        )
 
         return this.copy(
             rotationAngle = rotationAngle + rotation,
-            p1 = newPoint,
-            bottomRight = DrawPoint(
-                x = newPoint.x + width,
-                y = newPoint.y + height
-            ),
+            p1 = newP1,
+            bottomRight = newBottomRight,
             zoom = newZoom
         )
     }

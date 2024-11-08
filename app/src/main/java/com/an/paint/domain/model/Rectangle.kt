@@ -6,8 +6,8 @@ import com.an.paint.domain.util.Element
 import java.lang.Math.abs
 
 data class Rectangle(
-    override val p1: DrawPoint,
-    val bottomRight: DrawPoint,
+    override val p1: Offset,
+    val bottomRight: Offset,
     override val color: Color,
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f
@@ -21,7 +21,7 @@ data class Rectangle(
         )
     }
 
-    override fun containsTouchPoint(point: DrawPoint): Boolean {
+    override fun containsTouchPoint(point: Offset): Boolean {
         val xCorrect = (point.x > p1.x && point.x < bottomRight.x) ||
             (point.x > bottomRight.x && point.x < p1.x)
 
@@ -41,7 +41,7 @@ data class Rectangle(
         val width = abs(p1.x - bottomRight.x) * zoom
         val height = abs(p1.y - bottomRight.y) * zoom
 
-        val newPoint = DrawPoint(
+        val newPoint = Offset(
             x = p1.x + offset.x,
             y = p1.y + offset.y
         )
@@ -49,7 +49,7 @@ data class Rectangle(
         return this.copy(
             rotationAngle = rotationAngle + rotation,
             p1 = newPoint,
-            bottomRight = DrawPoint(
+            bottomRight = Offset(
                 x = newPoint.x + width,
                 y = newPoint.y + height
             )

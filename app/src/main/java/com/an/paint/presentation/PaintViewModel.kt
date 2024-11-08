@@ -1,12 +1,11 @@
 package com.an.paint.presentation
 
-import android.util.Log
+
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.an.paint.domain.FilterType
 import com.an.paint.domain.model.Circle
-import com.an.paint.domain.model.DrawPoint
 import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
@@ -71,7 +70,7 @@ class PaintViewModel(
             is PaintAction.AddImage -> {
                 _state.update { it.copy(
                     elements = state.value.elements + Image(
-                        p1 = DrawPoint(x = 0f, y = 0f),
+                        p1 = Offset(x = 0f, y = 0f),
                         bottomRight = action.size,
                         bitmap = action.bitmap
                     )
@@ -118,7 +117,7 @@ class PaintViewModel(
         }
     }
 
-    private fun addElement(p1: DrawPoint) {
+    private fun addElement(p1: Offset) {
         when(state.value.selectedShape) {
             1 -> { // Line
                 if(state.value.helperPoint == null) {
@@ -175,7 +174,7 @@ class PaintViewModel(
 
     }
 
-    private fun selectElement(p1: DrawPoint){
+    private fun selectElement(p1: Offset){
         _state.value.elements.forEachIndexed { index, element  ->
             if (element.containsTouchPoint(p1)){
                 _state.update { it.copy(
@@ -187,7 +186,7 @@ class PaintViewModel(
         }
     }
 
-    private fun calculateRadius(p1: DrawPoint, p2: DrawPoint): Float {
+    private fun calculateRadius(p1: Offset, p2: Offset): Float {
         return sqrt((p2.x - p1.x).pow(2) + (p2.y - p1.y).pow(2))
     }
 

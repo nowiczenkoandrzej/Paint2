@@ -8,7 +8,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 data class Circle(
-    override val p1: DrawPoint,
+    override val p1: Offset,
     val radius: Float,
     override val color: Color,
     override val rotationAngle: Float = 0f,
@@ -23,7 +23,7 @@ data class Circle(
         )
     }
 
-    override fun containsTouchPoint(point: DrawPoint): Boolean {
+    override fun containsTouchPoint(point: Offset): Boolean {
         return calculateRadius(p1, point) <= radius
     }
 
@@ -35,7 +35,7 @@ data class Circle(
 
     override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
         return this.copy(
-            p1 = DrawPoint(
+            p1 = Offset(
                 x = p1.x + offset.x,
                 y = p1.y + offset.y
             ),
@@ -44,7 +44,7 @@ data class Circle(
         )
     }
 
-    private fun calculateRadius(p1: DrawPoint, p2: DrawPoint): Float {
+    private fun calculateRadius(p1: Offset, p2: Offset): Float {
         return sqrt((p2.x - p1.x).pow(2) + (p2.y - p1.y).pow(2))
     }
 }

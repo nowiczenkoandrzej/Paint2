@@ -28,10 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.an.paint.domain.model.DrawPoint
 
 import com.an.paint.domain.model.Line
 
@@ -61,7 +61,7 @@ fun LineEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newLine = Line(
-                        p1 = DrawPoint(
+                        p1 = Offset(
                             x = newValue.toFloat(),
                             y = editedLine.p1.y
                         ),
@@ -83,7 +83,7 @@ fun LineEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newLine = Line(
-                        p1 = DrawPoint(
+                        p1 = Offset(
                             x = editedLine.p1.x,
                             y = newValue.toFloat()
                         ),
@@ -114,7 +114,7 @@ fun LineEditPanel(
 
                     val newLine = Line(
                         p1 = editedLine.p1,
-                        end = DrawPoint(
+                        end = Offset(
                             x = newValue.toFloat(),
                             y = editedLine.end.y
                         ),
@@ -136,7 +136,7 @@ fun LineEditPanel(
 
                     val newLine = Line(
                         p1 = editedLine.p1,
-                        end = DrawPoint(
+                        end = Offset(
                             x = editedLine.end.x,
                             y = newValue.toFloat()
                         ),

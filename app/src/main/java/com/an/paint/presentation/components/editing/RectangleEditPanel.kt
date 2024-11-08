@@ -28,10 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.an.paint.domain.model.DrawPoint
 import com.an.paint.domain.model.Rectangle
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +58,7 @@ fun RectangleEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newRectangle = Rectangle(
-                        p1 = DrawPoint(
+                        p1 = Offset(
                             x = newValue.toFloat(),
                             y = editedRectangle.p1.y
                         ),
@@ -80,7 +80,7 @@ fun RectangleEditPanel(
                     if(newValue.isEmpty()) newValue = "0"
 
                     val newRectangle = Rectangle(
-                        p1 = DrawPoint(
+                        p1 = Offset(
                             x = editedRectangle.p1.x,
                             y = newValue.toFloat()
                         ),
@@ -110,7 +110,7 @@ fun RectangleEditPanel(
 
                     val newRectangle = Rectangle(
                         p1 = editedRectangle.p1,
-                        bottomRight = DrawPoint(
+                        bottomRight = Offset(
                             x = newValue.toFloat(),
                             y = editedRectangle.bottomRight.y
                         ),
@@ -132,7 +132,7 @@ fun RectangleEditPanel(
 
                     val newRectangle = Rectangle(
                         p1 = editedRectangle.p1,
-                        bottomRight = DrawPoint(
+                        bottomRight = Offset(
                             x = editedRectangle.bottomRight.x,
                             y = newValue.toFloat()
                         ),

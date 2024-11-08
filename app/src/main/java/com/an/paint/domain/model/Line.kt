@@ -7,8 +7,8 @@ import kotlin.IllegalArgumentException
 import kotlin.math.abs
 
 data class Line(
-    override val p1: DrawPoint,
-    val end: DrawPoint,
+    override val p1: Offset,
+    val end: Offset,
     override val color: Color,
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f
@@ -22,11 +22,11 @@ data class Line(
         )
     }
 
-    override fun containsTouchPoint(point: DrawPoint): Boolean {
+    override fun containsTouchPoint(point: Offset): Boolean {
         try {
             val (a, b) = linearFunction(p1, end)
 
-            if(!point.isXBetween(p1, end))
+            if(!point.isBetweenPoints(p1, end))
                 return false
 
             val tolerance = 20f
@@ -49,7 +49,7 @@ data class Line(
         val width = abs(p1.x - end.x) * zoom
         val height = abs(p1.y - end.y) * zoom
 
-        val newPoint = DrawPoint(
+        val newPoint = Offset(
             x = p1.x + offset.x,
             y = p1.y + offset.y
         )
@@ -57,14 +57,14 @@ data class Line(
         return this.copy(
             rotationAngle = rotationAngle + rotation,
             p1 = newPoint,
-            end = DrawPoint(
+            end = Offset(
                 x = newPoint.x + width,
                 y = newPoint.y + height
             )
         )
     }
 
-    private fun linearFunction(p1: DrawPoint, p2: DrawPoint): Pair<Float, Float> {
+    private fun linearFunction(p1: Offset, p2: Offset): Pair<Float, Float> {
         if(p1.x == p2.x) throw IllegalArgumentException("Same x")
 
         val a = (p2.y - p1.y) / (p2.x - p1.x)
@@ -72,6 +72,10 @@ data class Line(
 
 
         return Pair(a, b)
+    }
+
+    private fun Offset.isBetweenPoints(p1: Offset, p2: Offset): Boolean {
+        return (this.x > p1.x && this.x < p2.x) || (this.x < p1.x && this.x > p2.x)
     }
 
 

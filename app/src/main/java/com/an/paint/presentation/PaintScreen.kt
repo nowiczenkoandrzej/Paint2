@@ -1,8 +1,6 @@
 package com.an.paint.presentation
 
 import ColorPicker
-import android.content.Intent
-import android.content.UriMatcher
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -22,14 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.window.Popup
-import androidx.core.net.UriCompat
 import com.an.paint.data.toBitmap
-import com.an.paint.domain.model.DrawPoint
-import com.an.paint.domain.model.toDrawPoint
 import com.an.paint.presentation.components.DrawingArea
 import com.an.paint.presentation.components.editing.SelectedElementEditPanel
 import com.an.paint.presentation.components.TopPanel
@@ -69,7 +63,7 @@ fun PaintScreen(
 
             viewModel.onAction(PaintAction.AddImage(
                 bitmap = uri.toBitmap(context),
-                size = DrawPoint(width, height)
+                size = Offset(width, height)
             ))
         }
 
@@ -89,7 +83,7 @@ fun PaintScreen(
 
         DrawingArea(
             onTap = {
-                viewModel.onAction(PaintAction.TapDrawingArea(it.toDrawPoint()))
+                viewModel.onAction(PaintAction.TapDrawingArea(it))
 
             },
             elements = state.elements,
@@ -97,7 +91,8 @@ fun PaintScreen(
 
             onTransform = { zoom, rotation, offset ->
                 viewModel.onAction(PaintAction.TransformElement(zoom, rotation, offset))
-            }
+            },
+            selectedElementIndex = state.selectedElementIndex
         )
         Spacer(modifier = Modifier.weight(1f))
         AnimatedVisibility(state.isInEditMode && state.selectedElement != null) {
