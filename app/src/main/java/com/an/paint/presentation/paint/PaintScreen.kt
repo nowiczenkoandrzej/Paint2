@@ -1,4 +1,4 @@
-package com.an.paint.presentation
+package com.an.paint.presentation.paint
 
 import ColorPicker
 import android.graphics.BitmapFactory
@@ -23,7 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Popup
+import androidx.navigation.NavController
 import com.an.paint.data.toBitmap
+import com.an.paint.presentation.PaintViewModel
 import com.an.paint.presentation.components.DrawingArea
 import com.an.paint.presentation.components.editing.SelectedElementEditPanel
 import com.an.paint.presentation.components.TopPanel
@@ -31,7 +33,8 @@ import com.an.paint.presentation.components.TopPanel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaintScreen(
-    viewModel: PaintViewModel
+    viewModel: PaintViewModel,
+    navController: NavController
 ) {
 
     val state = viewModel
@@ -61,7 +64,8 @@ fun PaintScreen(
             val width = options.outWidth.toFloat()
             val height = options.outHeight.toFloat()
 
-            viewModel.onAction(PaintAction.AddImage(
+            viewModel.onAction(
+                PaintAction.AddImage(
                 bitmap = uri.toBitmap(context),
                 size = Offset(width, height)
             ))
@@ -92,7 +96,8 @@ fun PaintScreen(
             onTransform = { zoom, rotation, offset ->
                 viewModel.onAction(PaintAction.TransformElement(zoom, rotation, offset))
             },
-            selectedElementIndex = state.selectedElementIndex
+            selectedElementIndex = state.selectedElementIndex,
+            selectedElement = state.selectedElement
         )
         Spacer(modifier = Modifier.weight(1f))
         AnimatedVisibility(state.isInEditMode && state.selectedElement != null) {
@@ -100,7 +105,7 @@ fun PaintScreen(
                 SelectedElementEditPanel(
                     element = state.selectedElement,
                     onSubmit = {
-
+                        viewModel.onAction(PaintAction.SaveChanges)
                     },
                     onChangeDetails = {
                         viewModel.onAction(PaintAction.EditElement(it))

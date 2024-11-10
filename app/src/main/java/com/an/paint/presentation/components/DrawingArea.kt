@@ -40,6 +40,7 @@ fun DrawingArea(
     onTap: (Offset) -> Unit,
     elements: List<Element> = emptyList(),
     lastTouchPoint: Offset?,
+    selectedElement: Element? = null,
     selectedElementIndex: Int? = null,
     onTransform: (Float, Float, Offset) -> Unit
 ) {
@@ -100,12 +101,15 @@ fun DrawingArea(
                         pivot = element.p1!!
                     )
                 }) {
-                        drawElement(
-                            element = element,
-                            scope = this,
-                            selectedElementIndex = selectedElementIndex,
-                            currentElementIndex = index
-                        )
+                    val alpha = if(selectedElementIndex == null) 1f else 0.6f
+
+                    if(selectedElementIndex == index) return@withTransform
+
+                    drawElement(
+                        element = element,
+                        scope = this,
+                        alpha = alpha
+                    )
 
                 }
             }
@@ -119,8 +123,29 @@ fun DrawingArea(
             )
 
         }
-        if(selectedElementIndex != null) {
+        if(selectedElement != null) {
+            clipRect {
+                withTransform({
+                    if(selectedElement.p1 == null) return@withTransform
 
+                    rotate(
+                        degrees = selectedElement.rotationAngle,
+                        pivot = calculatePivot(selectedElement)
+                    )
+
+                    val scale = if(selectedElement is Image) selectedElement.zoom else 1f
+
+                    scale(
+                        scale = scale,
+                        pivot = selectedElement.p1!!
+                    )
+                }) {
+                    drawElement(
+                        element = selectedElement,
+                        scope = this,
+                    )
+                }
+            }
         }
     }
 }
@@ -178,11 +203,9 @@ private fun calculatePivot(element: Element): Offset {
 private fun drawElement(
     element: Element,
     scope: DrawScope,
-    selectedElementIndex: Int?,
-    currentElementIndex: Int
+    alpha: Float = 1f
 ) {
 
-    val alpha = if(selectedElementIndex != null && selectedElementIndex != currentElementIndex) 0.6f else  1f
 
     when(element) {
         is Line -> {

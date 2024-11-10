@@ -11,6 +11,7 @@ data class Image(
     override val p1: Offset,
     val bottomRight: Offset,
     val bitmap: Bitmap,
+    val originalBitmap: Bitmap,
     override val color: Color = Color.White,
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f

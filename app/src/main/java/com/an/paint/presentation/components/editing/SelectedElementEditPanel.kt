@@ -19,10 +19,6 @@ import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.util.Element
-import com.an.paint.presentation.PaintAction
-import com.an.paint.presentation.components.editing.CircleEditPanel
-import com.an.paint.presentation.components.editing.LineEditPanel
-import com.an.paint.presentation.components.editing.RectangleEditPanel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +27,7 @@ fun SelectedElementEditPanel(
     modifier: Modifier = Modifier,
     onSubmit: () -> Unit,
     onChangeDetails: (Element) -> Unit,
-    onApplyFilter: (FilterType) -> Unit
+    onApplyFilter: (FilterType) -> Unit,
 ) {
 
     Column(

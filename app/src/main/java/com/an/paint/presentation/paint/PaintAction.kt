@@ -1,4 +1,4 @@
-package com.an.paint.presentation
+package com.an.paint.presentation.paint
 
 import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
@@ -14,8 +14,10 @@ sealed interface PaintAction {
 
     data class AddImage(val bitmap: Bitmap, val size: Offset): PaintAction
     data class ApplyFilter(val filter: FilterType): PaintAction
-    data class TransformElement(val zoom: Float, val rotation: Float, val offset: Offset): PaintAction
+    data class TransformElement(val zoom: Float, val rotation: Float, val offset: Offset):
+        PaintAction
     object ChangeMode: PaintAction
+    object SaveChanges: PaintAction
 
 
 }

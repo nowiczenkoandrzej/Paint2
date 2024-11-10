@@ -11,6 +11,7 @@ import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.ImageProcessor
 import com.an.paint.domain.util.Element
+import com.an.paint.presentation.paint.PaintAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -72,7 +73,8 @@ class PaintViewModel(
                     elements = state.value.elements + Image(
                         p1 = Offset(x = 0f, y = 0f),
                         bottomRight = action.size,
-                        bitmap = action.bitmap
+                        bitmap = action.bitmap,
+                        originalBitmap = action.bitmap
                     )
                 )}
             }
@@ -89,6 +91,14 @@ class PaintViewModel(
 
                 updateList(newElement)
             }
+
+            PaintAction.SaveChanges -> {
+                _state.update { it.copy(
+                    selectedElement = null,
+                    selectedElementIndex = null,
+                    isInEditMode = false
+                ) }
+            }
         }
     }
 
@@ -96,7 +106,7 @@ class PaintViewModel(
         if(state.value.selectedElement is Image) {
             viewModelScope.launch {
 
-                val oldBitmap = (state.value.selectedElement as Image).bitmap
+                val oldBitmap = (state.value.selectedElement as Image).originalBitmap
 
                 val newBitmap = withContext(Dispatchers.IO) {
                     when(filter) {
@@ -107,10 +117,14 @@ class PaintViewModel(
                         FilterType.Sobel -> imageProcessor.sobelFilter(oldBitmap)
                     }
                 }
+
+
+
                 val newImage = Image(
                     p1 = (state.value.selectedElement as Image).p1,
                     bottomRight = (state.value.selectedElement as Image).bottomRight,
-                    bitmap = newBitmap
+                    bitmap = newBitmap,
+                    originalBitmap = (state.value.selectedElement as Image).originalBitmap
                 )
                 updateList(newImage)
             }
