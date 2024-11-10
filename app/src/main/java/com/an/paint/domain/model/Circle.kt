@@ -14,14 +14,6 @@ data class Circle(
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f
 ): Element {
-    override fun draw(): DrawDetails {
-        return DrawDetails.Circle(
-            p1 = p1,
-            radius = radius,
-            color = color,
-            zoom = zoom
-        )
-    }
 
     override fun containsTouchPoint(point: Offset): Boolean {
         return calculateRadius(p1, point) <= radius

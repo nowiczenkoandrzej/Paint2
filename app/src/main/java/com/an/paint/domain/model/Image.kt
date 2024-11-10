@@ -15,14 +15,6 @@ data class Image(
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f
 ): Element {
-    override fun draw(): DrawDetails {
-        return DrawDetails.Image(
-            p1 = p1,
-            p2 = bottomRight,
-            bitmap = bitmap,
-            zoom = zoom
-        )
-    }
 
     override fun containsTouchPoint(point: Offset): Boolean {
         val xCorrect = (point.x > p1.x && point.x < bottomRight.x) ||

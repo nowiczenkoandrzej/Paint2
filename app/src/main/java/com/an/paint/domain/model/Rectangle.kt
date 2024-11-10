@@ -12,14 +12,6 @@ data class Rectangle(
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f
 ): Element {
-    override fun draw(): DrawDetails {
-        return DrawDetails.Rectangle(
-            p1 = p1,
-            p2 = bottomRight,
-            color = color,
-            zoom = zoom
-        )
-    }
 
     override fun containsTouchPoint(point: Offset): Boolean {
         val xCorrect = (point.x > p1.x && point.x < bottomRight.x) ||

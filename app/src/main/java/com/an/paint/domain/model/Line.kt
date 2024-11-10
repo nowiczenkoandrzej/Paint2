@@ -13,14 +13,6 @@ data class Line(
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f
 ): Element {
-    override fun draw(): DrawDetails {
-        return DrawDetails.Line(
-            p1 = p1,
-            p2 = end,
-            color = color,
-            zoom = zoom
-        )
-    }
 
     override fun containsTouchPoint(point: Offset): Boolean {
         try {
