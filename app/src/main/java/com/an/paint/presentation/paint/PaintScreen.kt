@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
 import com.an.paint.data.toBitmap
+import com.an.paint.domain.util.Screen
 import com.an.paint.presentation.PaintViewModel
 import com.an.paint.presentation.components.DrawingArea
 import com.an.paint.presentation.components.editing.SelectedElementEditPanel
@@ -38,7 +39,7 @@ fun PaintScreen(
 ) {
 
     val state = viewModel
-        .state
+        .paintState
         .collectAsState()
         .value
 
@@ -112,6 +113,9 @@ fun PaintScreen(
                     },
                     onApplyFilter = {
                         viewModel.onAction(PaintAction.ApplyFilter(it))
+                    },
+                    onCutImage = {
+                        viewModel.onAction(PaintAction.Navigate(Screen.CroppingImage.route))
                     }
                 )
             }

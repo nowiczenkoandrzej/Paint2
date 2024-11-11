@@ -32,13 +32,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.an.paint.R
+import com.an.paint.domain.util.Shape
 
 @Composable
 fun TopPanel(
     modifier: Modifier = Modifier,
-    selectedShape: Int = 1,
+    selectedShape: Shape,
     selectedColor: Color = Color.Black,
-    onSelectShape: (Int) -> Unit,
+    onSelectShape: (Shape) -> Unit,
     onColorPickerClick: (Boolean) -> Unit,
     onChangeModeClick: () -> Unit,
     isInEditMode: Boolean = false,
@@ -64,24 +65,24 @@ fun TopPanel(
         Box {
             IconButton(onClick = { shapePickerExpanded = true }) {
                 when(selectedShape) {
-                    1 -> {
+                    Shape.LINE -> {
                         Icon(
                             painter = painterResource(id = R.drawable.line_24),
-                            contentDescription = "Line",
+                            contentDescription = Shape.LINE.name,
                             modifier = Modifier.size(48.dp)
                         )
                     }
-                    2 -> {
+                    Shape.CIRCLE -> {
                         Icon(
                             painter = painterResource(id = R.drawable.outline_circle_24),
-                            contentDescription = "Circle",
+                            contentDescription = Shape.CIRCLE.name,
                             modifier = Modifier.size(48.dp)
                         )
                     }
-                    3 -> {
+                    Shape.RECTANGLE -> {
                         Icon(
                             painter = painterResource(id = R.drawable.outline_rectangle_24),
-                            contentDescription = "Rectangle",
+                            contentDescription = Shape.RECTANGLE.name,
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -93,7 +94,7 @@ fun TopPanel(
                     text = { Text(text = "Line") },
                     onClick = {
                         shapePickerExpanded = false
-                        onSelectShape(1)
+                        onSelectShape(Shape.LINE)
                     },
                     leadingIcon = {
                         Icon(
@@ -106,7 +107,7 @@ fun TopPanel(
                     text = { Text(text = "Circle") },
                     onClick = {
                         shapePickerExpanded = false
-                        onSelectShape(2)
+                        onSelectShape(Shape.CIRCLE)
                     },
                     leadingIcon = {
                         Icon(
@@ -119,7 +120,7 @@ fun TopPanel(
                     text = { Text(text = "Rectangle") },
                     onClick = {
                         shapePickerExpanded = false
-                        onSelectShape(3)
+                        onSelectShape(Shape.RECTANGLE)
                     },
                     leadingIcon = {
                         Icon(

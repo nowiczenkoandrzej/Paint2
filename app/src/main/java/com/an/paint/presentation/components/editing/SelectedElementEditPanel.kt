@@ -28,6 +28,7 @@ fun SelectedElementEditPanel(
     onSubmit: () -> Unit,
     onChangeDetails: (Element) -> Unit,
     onApplyFilter: (FilterType) -> Unit,
+    onCutImage: () -> Unit
 ) {
 
     Column(
@@ -65,7 +66,7 @@ fun SelectedElementEditPanel(
             is Image -> {
                 ImageEditPanel(
                     onChangeDetails = { onApplyFilter(it) },
-                    editedImage = element
+                    onCutImage = { onCutImage() }
                 )
             }
         }

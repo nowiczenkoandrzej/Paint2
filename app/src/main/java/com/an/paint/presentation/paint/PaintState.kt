@@ -1,11 +1,12 @@
-package com.an.paint.presentation
+package com.an.paint.presentation.paint
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.util.Element
+import com.an.paint.domain.util.Shape
 
 data class PaintState(
-    val selectedShape: Int = 1,
+    val selectedShape: Shape = Shape.LINE,
     val helperPoint: Offset? = null,
     val elements: List<Element> = emptyList(),
     val selectedColor: Color = Color.Black,

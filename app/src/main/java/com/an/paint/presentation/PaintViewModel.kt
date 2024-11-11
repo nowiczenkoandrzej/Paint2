@@ -11,10 +11,15 @@ import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.ImageProcessor
 import com.an.paint.domain.util.Element
+import com.an.paint.domain.util.Shape
+import com.an.paint.presentation.crop.CropState
 import com.an.paint.presentation.paint.PaintAction
+import com.an.paint.presentation.paint.PaintState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,52 +30,54 @@ class PaintViewModel(
     private val imageProcessor: ImageProcessor
 ): ViewModel() {
 
-    private val _state = MutableStateFlow(PaintState())
-    val state = _state.asStateFlow()
+    private val _paintState = MutableStateFlow(PaintState())
+    val paintState = _paintState.asStateFlow()
 
+    private val _cropState = MutableStateFlow(CropState())
+    val cropState = _cropState.asStateFlow()
+
+    private val _events = Channel<PaintEvent>()
+    val events = _events.receiveAsFlow()
     fun onAction(action: PaintAction) {
         when(action) {
+            is PaintAction.EditElement -> updateList(action.newElement)
+            is PaintAction.ApplyFilter -> applyFilter(action.filter)
+
             is PaintAction.TapDrawingArea -> {
-                if(state.value.isInEditMode)
+                if(paintState.value.isInEditMode)
                     selectElement(action.p1)
                 else
                     addElement(action.p1)
-
             }
+
             is PaintAction.SelectShape -> {
-                _state.update {
+                _paintState.update {
                     it.copy(
-                        selectedShape = action.index,
+                        selectedShape = action.shape,
                         helperPoint = null,
                         isInEditMode = false
                     )
                 }
             }
-
             is PaintAction.PickColor -> {
-                _state.update { it.copy(
+                _paintState.update { it.copy(
                     selectedColor = action.color,
                     helperPoint = null
                 ) }
             }
 
             PaintAction.ChangeMode -> {
-                _state.update { it.copy(
-                    isInEditMode = !state.value.isInEditMode,
+                _paintState.update { it.copy(
+                    isInEditMode = !paintState.value.isInEditMode,
                     helperPoint = null,
                     selectedElement = null,
                     selectedElementIndex = null
                 )}
-
-            }
-
-            is PaintAction.EditElement -> {
-                updateList(action.newElement)
             }
 
             is PaintAction.AddImage -> {
-                _state.update { it.copy(
-                    elements = state.value.elements + Image(
+                _paintState.update { it.copy(
+                    elements = paintState.value.elements + Image(
                         p1 = Offset(x = 0f, y = 0f),
                         bottomRight = action.size,
                         bitmap = action.bitmap,
@@ -79,52 +86,62 @@ class PaintViewModel(
                 )}
             }
 
-            is PaintAction.ApplyFilter -> {
-                applyFilter(action.filter)
-            }
-
             is PaintAction.TransformElement -> {
-
-                if(state.value.selectedElement == null) return
-
-                val newElement = state.value.selectedElement!!.transform(action.zoom, action.rotation, action.offset)
-
+                if(paintState.value.selectedElement == null) return
+                val newElement = paintState.value.selectedElement!!.transform(action.zoom, action.rotation, action.offset)
                 updateList(newElement)
             }
 
             PaintAction.SaveChanges -> {
-                _state.update { it.copy(
+                _paintState.update { it.copy(
                     selectedElement = null,
                     selectedElementIndex = null,
                     isInEditMode = false
                 ) }
             }
+
+            is PaintAction.CutImage -> {
+
+            }
+
+            is PaintAction.SetCuttingFrame -> {
+                _cropState.update { it.copy(
+                    topLeft = action.topLeft,
+                    bottomRight = action.bottomRight
+                ) }
+            }
+
+            is PaintAction.Navigate -> {
+                viewModelScope.launch {
+                    _events.send(PaintEvent.Navigate(action.route))
+                }
+            }
         }
     }
 
     private fun applyFilter(filter: FilterType) {
-        if(state.value.selectedElement is Image) {
+        if(paintState.value.selectedElement is Image) {
             viewModelScope.launch {
 
-                val oldBitmap = (state.value.selectedElement as Image).originalBitmap
+                val element = paintState.value.selectedElement as Image
 
                 val newBitmap = withContext(Dispatchers.IO) {
                     when(filter) {
-                        FilterType.Dilate -> imageProcessor.dilate(oldBitmap)
-                        FilterType.Erode -> imageProcessor.erode(oldBitmap)
-                        FilterType.Median -> imageProcessor.medianFilter(oldBitmap)
-                        FilterType.Smooth -> imageProcessor.smoothingFilter(oldBitmap)
-                        FilterType.Sobel -> imageProcessor.sobelFilter(oldBitmap)
+                        FilterType.Dilate -> imageProcessor.dilate(element.originalBitmap)
+                        FilterType.Erode -> imageProcessor.erode(element.originalBitmap)
+                        FilterType.Median -> imageProcessor.medianFilter(element.originalBitmap)
+                        FilterType.Smooth -> imageProcessor.smoothingFilter(element.originalBitmap)
+                        FilterType.Sobel -> imageProcessor.sobelFilter(element.originalBitmap)
                     }
                 }
 
-
-
                 val newImage = Image(
-                    p1 = (state.value.selectedElement as Image).p1,
-                    bottomRight = (state.value.selectedElement as Image).bottomRight,
+                    p1 = element.p1,
+                    bottomRight = element.bottomRight,
                     bitmap = newBitmap,
-                    originalBitmap = (state.value.selectedElement as Image).originalBitmap
+                    originalBitmap = element.originalBitmap,
+                    rotationAngle = element.rotationAngle,
+                    zoom = element.zoom
                 )
                 updateList(newImage)
             }
@@ -132,53 +149,53 @@ class PaintViewModel(
     }
 
     private fun addElement(p1: Offset) {
-        when(state.value.selectedShape) {
-            1 -> { // Line
-                if(state.value.helperPoint == null) {
-                    _state.update { it.copy(
+        when(paintState.value.selectedShape) {
+            Shape.LINE -> {
+                if(paintState.value.helperPoint == null) {
+                    _paintState.update { it.copy(
                         helperPoint = p1
                     )}
                 } else {
-                    val helperPoint = state.value.helperPoint!!
-                    _state.update { it.copy(
-                        elements = state.value.elements + Line(
+                    val helperPoint = paintState.value.helperPoint!!
+                    _paintState.update { it.copy(
+                        elements = paintState.value.elements + Line(
                             p1 = helperPoint,
                             end = p1,
-                            color = state.value.selectedColor
+                            color = paintState.value.selectedColor
                         ),
                         helperPoint = null
                     )}
                 }
             }
-            2 -> { // Circle
-                if(state.value.helperPoint == null) {
-                    _state.update { it.copy(
+            Shape.CIRCLE -> {
+                if(paintState.value.helperPoint == null) {
+                    _paintState.update { it.copy(
                         helperPoint = p1
                     )}
                 } else {
-                    val helperPoint = state.value.helperPoint!!
-                    _state.update { it.copy(
-                        elements = state.value.elements + Circle(
+                    val helperPoint = paintState.value.helperPoint!!
+                    _paintState.update { it.copy(
+                        elements = paintState.value.elements + Circle(
                             p1 = helperPoint,
                             radius = calculateRadius(helperPoint, p1),
-                            color = state.value.selectedColor
+                            color = paintState.value.selectedColor
                         ),
                         helperPoint = null
                     )}
                 }
             }
-            3 -> { // Rectangle
-                if(state.value.helperPoint == null) {
-                    _state.update { it.copy(
+            Shape.RECTANGLE -> {
+                if(paintState.value.helperPoint == null) {
+                    _paintState.update { it.copy(
                         helperPoint = p1
                     )}
                 } else {
-                    val helperPoint = state.value.helperPoint!!
-                    _state.update { it.copy(
-                        elements = state.value.elements + Rectangle(
+                    val helperPoint = paintState.value.helperPoint!!
+                    _paintState.update { it.copy(
+                        elements = paintState.value.elements + Rectangle(
                             p1 = helperPoint,
                             bottomRight = p1,
-                            color = state.value.selectedColor
+                            color = paintState.value.selectedColor
                         ),
                         helperPoint = null
                     )}
@@ -189,9 +206,9 @@ class PaintViewModel(
     }
 
     private fun selectElement(p1: Offset){
-        _state.value.elements.forEachIndexed { index, element  ->
+        _paintState.value.elements.forEachIndexed { index, element  ->
             if (element.containsTouchPoint(p1)){
-                _state.update { it.copy(
+                _paintState.update { it.copy(
                     selectedElement = element,
                     helperPoint = null,
                     selectedElementIndex = index
@@ -205,11 +222,11 @@ class PaintViewModel(
     }
 
     private fun updateList(newElement: Element){
-        val newList = state.value.elements.toMutableList().apply {
-            this[state.value.selectedElementIndex!!] = newElement
+        val newList = paintState.value.elements.toMutableList().apply {
+            this[paintState.value.selectedElementIndex!!] = newElement
         }.toList()
 
-        _state.update { it.copy(
+        _paintState.update { it.copy(
             elements = newList,
             selectedElement = newElement
         ) }
