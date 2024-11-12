@@ -10,6 +10,7 @@ import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.ImageProcessor
+import com.an.paint.domain.model.BezierCurve
 import com.an.paint.domain.util.Element
 import com.an.paint.domain.util.Screen
 import com.an.paint.domain.util.Shape
@@ -39,6 +40,8 @@ class PaintViewModel(
 
     private val _events = Channel<PaintEvent>()
     val events = _events.receiveAsFlow()
+
+    private val bezierPoints = mutableListOf<Offset>()
     fun onAction(action: PaintAction) {
         when(action) {
             is PaintAction.EditElement -> updateList(action.newElement)
@@ -201,6 +204,21 @@ class PaintViewModel(
                         ),
                         helperPoint = null
                     )}
+                }
+            }
+            Shape.CURVE -> {
+                bezierPoints.add(p1)
+                if(bezierPoints.size == 4) {
+                    _paintState.update { it.copy(
+                        elements = paintState.value.elements + BezierCurve(
+                            p1 = bezierPoints[0],
+                            p2 = bezierPoints[1],
+                            p3 = bezierPoints[2],
+                            p4 = bezierPoints[3],
+                            color = paintState.value.selectedColor
+                        )
+                    ) }
+                    bezierPoints.clear()
                 }
             }
         }

@@ -87,6 +87,13 @@ fun TopPanel(
                         )
                     }
 
+                    Shape.CURVE -> {
+                        Icon(
+                            painter = painterResource(id = R.drawable.outline_gesture_24),
+                            contentDescription = "bezier curve",
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
             }
             DropdownMenu(expanded = shapePickerExpanded, onDismissRequest = { shapePickerExpanded = false }) {
@@ -126,6 +133,19 @@ fun TopPanel(
                         Icon(
                             painter = painterResource(id = R.drawable.outline_rectangle_24),
                             contentDescription = "Rectangle"
+                        )
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(text = "Bezier Curve") },
+                    onClick = {
+                        shapePickerExpanded = false
+                        onSelectShape(Shape.CURVE)
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.outline_gesture_24),
+                            contentDescription = "bezier Curve"
                         )
                     }
                 )

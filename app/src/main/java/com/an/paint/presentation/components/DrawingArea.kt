@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.an.paint.domain.model.BezierCurve
 import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
@@ -244,6 +246,29 @@ private fun drawElement(
                 image = element.bitmap.asImageBitmap(),
                 topLeft = element.p1,
                 alpha = alpha
+            )
+        }
+        is BezierCurve -> {
+
+            val path = Path().apply {
+                moveTo(element.p1!!.x, element.p1!!.y)
+
+                cubicTo(
+                    x1 = element.p2.x,
+                    y1 = element.p2.y,
+                    x2 = element.p3.x,
+                    y2 = element.p3.y,
+                    x3 = element.p4.x,
+                    y3 = element.p4.y
+                )
+
+
+            }
+
+            scope.drawPath(
+                path = path,
+                color = element.color,
+                style = Stroke(width = 5f)
             )
         }
     }
