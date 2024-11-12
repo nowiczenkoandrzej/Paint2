@@ -115,7 +115,7 @@ fun PaintScreen(
                         viewModel.onAction(PaintAction.ApplyFilter(it))
                     },
                     onCutImage = {
-                        viewModel.onAction(PaintAction.Navigate(Screen.CroppingImage.route))
+                        viewModel.onAction(PaintAction.PickImageToCut)
                     }
                 )
             }

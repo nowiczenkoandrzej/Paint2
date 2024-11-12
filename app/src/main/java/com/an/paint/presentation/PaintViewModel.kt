@@ -11,6 +11,7 @@ import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.ImageProcessor
 import com.an.paint.domain.util.Element
+import com.an.paint.domain.util.Screen
 import com.an.paint.domain.util.Shape
 import com.an.paint.presentation.crop.CropState
 import com.an.paint.presentation.paint.PaintAction
@@ -111,9 +112,10 @@ class PaintViewModel(
                 ) }
             }
 
-            is PaintAction.Navigate -> {
+            is PaintAction.PickImageToCut -> {
                 viewModelScope.launch {
-                    _events.send(PaintEvent.Navigate(action.route))
+                    _events.send(PaintEvent.Navigate(Screen.CroppingImage.route))
+
                 }
             }
         }
