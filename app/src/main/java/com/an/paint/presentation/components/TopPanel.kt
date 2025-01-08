@@ -177,8 +177,7 @@ fun TopPanel(
                 painter = painterResource(id = R.drawable.outline_mode_edit_outline_24),
                 contentDescription = "grab",
                 modifier = Modifier
-                    .size(48.dp)
-                    ,
+                    .size(48.dp),
             )
         }
 

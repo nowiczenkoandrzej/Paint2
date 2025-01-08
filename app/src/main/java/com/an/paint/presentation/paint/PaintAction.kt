@@ -21,5 +21,7 @@ sealed interface PaintAction {
     object ChangeMode: PaintAction
     object SaveChanges: PaintAction
 
+    data class ModifyBezierCurve(val point: Int, val offset: Offset): PaintAction
+
 
 }

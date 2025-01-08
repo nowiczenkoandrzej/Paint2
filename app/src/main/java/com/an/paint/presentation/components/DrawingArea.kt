@@ -250,17 +250,49 @@ private fun drawElement(
         }
         is BezierCurve -> {
 
+            scope.drawCircle(
+                center = element.p1!!,
+                color = Color.Black,
+                radius = 8f
+            )
+            element.points.forEach {
+                scope.drawCircle(
+                    center = it,
+                    color = Color.Black,
+                    radius = 8f
+                )
+            }
+
             val path = Path().apply {
                 moveTo(element.p1!!.x, element.p1!!.y)
 
-                cubicTo(
-                    x1 = element.p2.x,
-                    y1 = element.p2.y,
-                    x2 = element.p3.x,
-                    y2 = element.p3.y,
-                    x3 = element.p4.x,
-                    y3 = element.p4.y
-                )
+                val points = element.points
+
+
+                when(element.points.size) {
+                    1 -> {
+                        lineTo(points[0].x, points[0].y)
+
+                    }
+                    2 -> {
+                        quadraticBezierTo(
+                            x1 = points[0].x,
+                            y1 = points[0].y,
+                            x2 = points[1].x,
+                            y2 = points[1].y
+                        )
+                    }
+                    3 -> {
+                        cubicTo(
+                            x1 = points[0].x,
+                            y1 = points[0].y,
+                            x2 = points[1].x,
+                            y2 = points[1].y,
+                            x3 = points[2].x,
+                            y3 = points[2].y
+                        )
+                    }
+                }
 
 
             }

@@ -1,6 +1,7 @@
 package com.an.paint.presentation
 
 
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -121,6 +122,10 @@ class PaintViewModel(
 
                 }
             }
+
+            is PaintAction.ModifyBezierCurve -> {
+
+            }
         }
     }
 
@@ -208,16 +213,33 @@ class PaintViewModel(
             }
             Shape.CURVE -> {
                 bezierPoints.add(p1)
-                if(bezierPoints.size == 4) {
+
+
+                val points = bezierPoints.drop(1).toList()
+
+                if(bezierPoints.size == 1) {
                     _paintState.update { it.copy(
                         elements = paintState.value.elements + BezierCurve(
                             p1 = bezierPoints[0],
-                            p2 = bezierPoints[1],
-                            p3 = bezierPoints[2],
-                            p4 = bezierPoints[3],
+                            points = points,
                             color = paintState.value.selectedColor
                         )
                     ) }
+                } else if(bezierPoints.size > 1) {
+                    val elements = paintState.value.elements.dropLast(1) + BezierCurve(
+                        p1 = bezierPoints[0],
+                        points = points,
+                        color = paintState.value.selectedColor
+                    )
+                    _paintState.update { it.copy(
+                        elements = elements
+                    ) }
+
+                }
+
+
+
+                if(bezierPoints.size == 4) {
                     bezierPoints.clear()
                 }
             }
