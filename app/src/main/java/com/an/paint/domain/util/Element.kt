@@ -12,5 +12,5 @@ interface Element {
 
     fun containsTouchPoint(point: Offset): Boolean
     fun changeColor(color: Color): Element
-    fun transform(zoom: Float, rotation: Float, offset: Offset): Element
+    fun transform(zoom: Float, rotation: Float, offset: Offset, centroid: Offset): Element
 }

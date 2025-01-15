@@ -44,7 +44,7 @@ fun DrawingArea(
     lastTouchPoint: Offset?,
     selectedElement: Element? = null,
     selectedElementIndex: Int? = null,
-    onTransform: (Float, Float, Offset) -> Unit
+    onTransform: (Float, Float, Offset, Offset) -> Unit
 ) {
     val textMeasurer = rememberTextMeasurer()
 
@@ -62,11 +62,7 @@ fun DrawingArea(
             }
             .pointerInput(Unit) {
                 detectTransformGestures { centroid, pan, zoom, rotation ->
-                    onTransform(zoom, rotation, pan)
-                    Log.d(
-                        "TAG",
-                        "DrawingArea: zoom: $zoom, rotation: $rotation, centroid: $centroid, pan: $pan"
-                    )
+                    onTransform(zoom, rotation, pan, centroid)
                 }
             }
             .drawBehind {

@@ -29,7 +29,12 @@ data class Rectangle(
         )
     }
 
-    override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
+    override fun transform(
+        zoom: Float,
+        rotation: Float,
+        offset: Offset,
+        centroid: Offset
+    ): Element {
         val width = abs(p1.x - bottomRight.x) * zoom
         val height = abs(p1.y - bottomRight.y) * zoom
 

@@ -30,7 +30,12 @@ data class Image(
         return this
     }
 
-    override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
+    override fun transform(
+        zoom: Float,
+        rotation: Float,
+        offset: Offset,
+        centroid: Offset
+    ): Element {
 
         val center = Offset(
             x = (p1.x + bottomRight.x) / 2f,

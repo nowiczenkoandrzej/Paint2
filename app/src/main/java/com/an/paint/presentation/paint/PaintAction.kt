@@ -14,7 +14,7 @@ sealed interface PaintAction {
     data class EditElement(val newElement: Element): PaintAction
     data class AddImage(val bitmap: Bitmap, val size: Offset): PaintAction
     data class ApplyFilter(val filter: FilterType): PaintAction
-    data class TransformElement(val zoom: Float, val rotation: Float, val offset: Offset): PaintAction
+    data class TransformElement(val zoom: Float, val rotation: Float, val offset: Offset, val centroid: Offset): PaintAction
     data class CutImage(val topLeft: Offset, val bottomRight: Offset): PaintAction
     data class SetCuttingFrame(val topLeft: Offset, val bottomRight: Offset): PaintAction
     object PickImageToCut: PaintAction

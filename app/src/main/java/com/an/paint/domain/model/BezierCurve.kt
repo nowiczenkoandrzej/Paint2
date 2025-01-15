@@ -3,6 +3,8 @@ package com.an.paint.domain.model
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.util.Element
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 data class BezierCurve(
     override val color: Color = Color.Black,
@@ -15,6 +17,11 @@ data class BezierCurve(
 
     override fun containsTouchPoint(point: Offset): Boolean {
 
+        points.forEach {
+            if(calculateDistance(point, it) > 50f) {
+                return true
+            }
+        }
 
         return false
     }
@@ -25,40 +32,59 @@ data class BezierCurve(
         )
     }
 
-    override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
-        return this.copy(
-            zoom = zoom,
-            rotationAngle = rotation,
-            p1 = offset
-        )
-    }
+    override fun transform(
+        zoom: Float,
+        rotation: Float,
+        offset: Offset,
+        centroid: Offset
+    ): Element {
 
-    fun modifyCurve(point: Int, offset: Offset): Element {
-        val start = if(point != 0) {
-            this.p1
-        } else {
+        var minDistance = calculateDistance(p1!!, centroid)
+        var minIndex: Int? = null
+
+        points.forEachIndexed { index, it ->
+            val distance = calculateDistance(it, centroid)
+            if (distance < minDistance) {
+                minDistance = distance
+                minIndex = index
+            }
+        }
+
+        val newPoint = if(minIndex == null) {
             Offset(
-                x = this.p1!!.x + offset.x,
-                y = this.p1.y + offset.y
+                x = p1.x + offset.x,
+                y = p1.y + offset.y
+            )
+        }else {
+            Offset(
+                x = points[minIndex!!].x + offset.x,
+                y = points[minIndex!!].y + offset.y
             )
         }
 
-        val points = this.points
-
-        val newPoints = points.toMutableList().apply {
-            set(
-                point,
-                Offset(
-                    x = points[point].x + offset.x,
-                    y = points[point].y + offset.y,
-                )
+        if(minIndex == null) {
+            return this.copy(
+                p1 = newPoint
             )
-        }.toList()
+        } else {
 
-        return this.copy(
-            p1 = start,
-            points = newPoints
-        )
+            val newList = points.toMutableList().apply {
+                set(minIndex!!, newPoint)
+            }.toList()
+
+            return this.copy(
+                points = newList
+            )
+        }
+
     }
+
+    private fun calculateDistance(p1: Offset, p2: Offset): Float {
+        val x = p1.x - p2.x
+        val y = p1.y - p2.y
+
+        return sqrt(x.pow(2) + y.pow(2))
+    }
+
 
 }

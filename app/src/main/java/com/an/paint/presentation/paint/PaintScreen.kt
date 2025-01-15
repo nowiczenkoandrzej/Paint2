@@ -94,8 +94,8 @@ fun PaintScreen(
             elements = state.elements,
             lastTouchPoint = state.helperPoint,
 
-            onTransform = { zoom, rotation, offset ->
-                viewModel.onAction(PaintAction.TransformElement(zoom, rotation, offset))
+            onTransform = { zoom, rotation, offset, centroid ->
+                viewModel.onAction(PaintAction.TransformElement(zoom, rotation, offset, centroid))
             },
             selectedElementIndex = state.selectedElementIndex,
             selectedElement = state.selectedElement

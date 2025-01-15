@@ -37,7 +37,12 @@ data class Line(
         )
     }
 
-    override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
+    override fun transform(
+        zoom: Float,
+        rotation: Float,
+        offset: Offset,
+        centroid: Offset
+    ): Element {
         val width = abs(p1.x - end.x) * zoom
         val height = abs(p1.y - end.y) * zoom
 

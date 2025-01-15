@@ -25,7 +25,12 @@ data class Circle(
         )
     }
 
-    override fun transform(zoom: Float, rotation: Float, offset: Offset): Element {
+    override fun transform(
+        zoom: Float,
+        rotation: Float,
+        offset: Offset,
+        centroid: Offset
+    ): Element {
         return this.copy(
             p1 = Offset(
                 x = p1.x + offset.x,

@@ -93,7 +93,7 @@ class PaintViewModel(
 
             is PaintAction.TransformElement -> {
                 if(paintState.value.selectedElement == null) return
-                val newElement = paintState.value.selectedElement!!.transform(action.zoom, action.rotation, action.offset)
+                val newElement = paintState.value.selectedElement!!.transform(action.zoom, action.rotation, action.offset, action.centroid)
                 updateList(newElement)
             }
 
