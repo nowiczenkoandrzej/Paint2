@@ -43,7 +43,9 @@ fun TopPanel(
     onColorPickerClick: (Boolean) -> Unit,
     onChangeModeClick: () -> Unit,
     isInEditMode: Boolean = false,
-    onPickImage: () -> Unit
+    onPickImage: () -> Unit,
+    onSave: () -> Unit,
+    onNewDrawing: () -> Unit
 ) {
 
     var shapePickerExpanded by remember { mutableStateOf(false) }
@@ -186,6 +188,30 @@ fun TopPanel(
         }) {
             Icon(
                 painter = painterResource(id = R.drawable.outline_palette_24),
+                contentDescription = "pick color",
+                modifier = Modifier
+                    .size(48.dp),
+                tint = selectedColor
+            )
+        }
+
+        IconButton(onClick = {
+            onNewDrawing()
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_fiber_new_24),
+                contentDescription = "pick color",
+                modifier = Modifier
+                    .size(48.dp),
+                tint = selectedColor
+            )
+        }
+
+        IconButton(onClick = {
+            onSave()
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_save_24),
                 contentDescription = "pick color",
                 modifier = Modifier
                     .size(48.dp),

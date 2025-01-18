@@ -14,11 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.an.paint.domain.FilterType
+import com.an.paint.domain.model.BezierCurve
 import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
-import com.an.paint.domain.util.Element
+import com.an.paint.domain.model.Element
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +69,10 @@ fun SelectedElementEditPanel(
                     onChangeDetails = { onApplyFilter(it) },
                     onCutImage = { onCutImage() }
                 )
+            }
+
+            is BezierCurve -> {
+
             }
         }
 

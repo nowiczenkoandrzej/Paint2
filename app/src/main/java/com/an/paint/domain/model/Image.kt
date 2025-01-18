@@ -3,7 +3,7 @@ package com.an.paint.domain.model
 import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.an.paint.domain.util.Element
+
 
 data class Image(
     override val p1: Offset,

@@ -1,10 +1,12 @@
 package com.an.paint.presentation
 
 
-import android.util.Log
+import android.content.Context
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.an.paint.data.JsonManager
 import com.an.paint.domain.FilterType
 import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.Image
@@ -12,7 +14,7 @@ import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
 import com.an.paint.domain.ImageProcessor
 import com.an.paint.domain.model.BezierCurve
-import com.an.paint.domain.util.Element
+import com.an.paint.domain.model.Element
 import com.an.paint.domain.util.Screen
 import com.an.paint.domain.util.Shape
 import com.an.paint.presentation.crop.CropState
@@ -30,8 +32,10 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 class PaintViewModel(
-    private val imageProcessor: ImageProcessor
+    private val imageProcessor: ImageProcessor,
+    private val jsonManager: JsonManager
 ): ViewModel() {
+    private val KEY_ITEMS = "saved_items"
 
     private val _paintState = MutableStateFlow(PaintState())
     val paintState = _paintState.asStateFlow()
@@ -123,8 +127,14 @@ class PaintViewModel(
                 }
             }
 
-            is PaintAction.ModifyBezierCurve -> {
-
+            PaintAction.LoadFromSavedState -> {
+                val savedList = jsonManager.loadElementsFromFile()
+                _paintState.value = paintState.value.copy(
+                    elements = savedList
+                )
+            }
+            PaintAction.SaveToSavedState -> {
+                jsonManager.saveElementsToFile(paintState.value.elements)
             }
         }
     }

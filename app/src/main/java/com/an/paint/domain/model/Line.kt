@@ -2,9 +2,9 @@ package com.an.paint.domain.model
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.an.paint.domain.util.Element
 import kotlin.IllegalArgumentException
 import kotlin.math.abs
+
 
 data class Line(
     override val p1: Offset,

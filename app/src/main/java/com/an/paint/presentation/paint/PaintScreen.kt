@@ -83,7 +83,9 @@ fun PaintScreen(
             onColorPickerClick = { colorPickerExpanded = it},
             onChangeModeClick = { viewModel.onAction(PaintAction.ChangeMode)},
             isInEditMode = state.isInEditMode,
-            onPickImage = { launcher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
+            onPickImage = { launcher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+            onSave =  { viewModel.onAction(PaintAction.SaveToSavedState)},
+            onNewDrawing = { viewModel.onAction(PaintAction.LoadFromSavedState) }
         )
 
         DrawingArea(

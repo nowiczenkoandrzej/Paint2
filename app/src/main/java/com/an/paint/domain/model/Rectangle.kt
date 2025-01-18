@@ -2,8 +2,8 @@ package com.an.paint.domain.model
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.an.paint.domain.util.Element
 import java.lang.Math.abs
+
 
 data class Rectangle(
     override val p1: Offset,

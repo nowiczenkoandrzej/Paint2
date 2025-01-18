@@ -1,15 +1,15 @@
 package com.an.paint.domain.model
 
-import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.an.paint.domain.util.Element
 import kotlin.math.pow
 import kotlin.math.sqrt
+
 
 data class Circle(
     override val p1: Offset,
     val radius: Float,
+
     override val color: Color,
     override val rotationAngle: Float = 0f,
     override val zoom: Float = 1f

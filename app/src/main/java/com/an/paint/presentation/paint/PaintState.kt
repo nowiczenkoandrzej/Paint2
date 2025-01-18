@@ -2,7 +2,7 @@ package com.an.paint.presentation.paint
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.an.paint.domain.util.Element
+import com.an.paint.domain.model.Element
 import com.an.paint.domain.util.Shape
 
 data class PaintState(

@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.an.paint.domain.FilterType
-import com.an.paint.domain.util.Element
+import com.an.paint.domain.model.Element
 import com.an.paint.domain.util.Shape
 
 sealed interface PaintAction {
@@ -20,8 +20,7 @@ sealed interface PaintAction {
     object PickImageToCut: PaintAction
     object ChangeMode: PaintAction
     object SaveChanges: PaintAction
-
-    data class ModifyBezierCurve(val point: Int, val offset: Offset): PaintAction
-
+    object SaveToSavedState: PaintAction
+    object LoadFromSavedState: PaintAction
 
 }

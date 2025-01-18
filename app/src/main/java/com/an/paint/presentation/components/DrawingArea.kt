@@ -1,6 +1,5 @@
 package com.an.paint.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -31,7 +30,7 @@ import com.an.paint.domain.model.Circle
 import com.an.paint.domain.model.Image
 import com.an.paint.domain.model.Line
 import com.an.paint.domain.model.Rectangle
-import com.an.paint.domain.util.Element
+import com.an.paint.domain.model.Element
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

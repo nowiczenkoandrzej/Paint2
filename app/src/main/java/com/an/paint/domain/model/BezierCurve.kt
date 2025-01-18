@@ -2,9 +2,9 @@ package com.an.paint.domain.model
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.an.paint.domain.util.Element
 import kotlin.math.pow
 import kotlin.math.sqrt
+
 
 data class BezierCurve(
     override val color: Color = Color.Black,
